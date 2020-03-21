@@ -13,7 +13,8 @@ class AuthController < ApplicationController
   def payload(user)
     return nil unless user and user.id
     {
-        auth_token: JsonWebToken.encode({user_id: user.id}),
+        auth_token: JsonWebToken.encode({id: user.id, email: user.email}, 5.minutes.from_now),
+        refresh_token: JsonWebToken.encode({id: user.id, email: user.email}, 15.minutes.from_now),
         user: {id: user.id, email: user.email}
     }
   end
