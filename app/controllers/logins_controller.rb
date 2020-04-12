@@ -1,7 +1,7 @@
 class LoginsController < ApplicationController
-  before_action :authenticate_request, except: :sign_up
+  before_action :authenticate_request, except: [:sign_up, :index]
   def index
-    render json: {'logged_in' => true}
+    render "index.html"
   end
 
   def sign_up

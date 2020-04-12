@@ -23,6 +23,9 @@ gem 'bcrypt', '~> 3.1', '>= 3.1.13'
 # Use Active Storage variant
 # gem 'image_processing', '~> 1.2'
 
+# Use Devise gem for user authentication
+gem 'devise', '~> 4.7'
+
 # Use Json Web Token (JWT) for token based authentication
 gem 'jwt'
 
