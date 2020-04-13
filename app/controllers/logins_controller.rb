@@ -1,8 +1,5 @@
 class LoginsController < ApplicationController
-  before_action :authenticate_request, except: [:sign_up, :index]
-  def index
-    render "index.html"
-  end
+  before_action :authenticate_request, except: [:sign_up]
 
   def sign_up
     user = Login.new(user_params)

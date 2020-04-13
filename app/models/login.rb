@@ -1,7 +1,7 @@
 class Login < ApplicationRecord
   # Include default devise modules. Others available are:
   # :confirmable, :lockable, :timeoutable, :trackable and :omniauthable
-  devise :omniauthable, :omniauth_providers => [:facebook, :google_oauth2]
+  #devise :omniauthable, :omniauth_providers => [:facebook, :google_oauth2]
   has_secure_password validations: false
   validates :email, presence: true, uniqueness: true
   validates :email, format: { with: URI::MailTo::EMAIL_REGEXP }
