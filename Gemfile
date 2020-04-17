@@ -26,6 +26,13 @@ gem 'bcrypt', '~> 3.1', '>= 3.1.13'
 # Use Devise gem for user authentication
 gem 'devise', '~> 4.7'
 
+# Use ActiveAdmin for back office stuff
+gem 'activeadmin', github: 'activeadmin/activeadmin'
+gem 'active_admin_theme'
+
+gem 'ckeditor', '~> 4.3.0'
+gem 'bourbon'
+
 # Use Json Web Token (JWT) for token based authentication
 gem 'jwt'
 
