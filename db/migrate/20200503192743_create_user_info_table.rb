@@ -1,6 +1,6 @@
 class CreateUserInfoTable < ActiveRecord::Migration[6.0]
   def change
-    create_table :users_info do |t|
+    create_table :login_infos do |t|
       t.string :name
       t.string :gender
       t.string :date_of_birth
@@ -11,6 +11,6 @@ class CreateUserInfoTable < ActiveRecord::Migration[6.0]
       t.string :work
       t.boolean :is_deactivated
     end
-    add_reference :users_info, :logins, foreign_key: true
+    add_reference :login_infos, :logins, foreign_key: true
   end
 end
