@@ -3,7 +3,7 @@ class LoginsController < ApplicationController
 
   def sign_up
     new_user = Login.new(login_params)
-    new_user.build_profile({name: params[:name], phone: params[:phone]})
+    new_user.build_profile(name: params[:name], phone: params[:phone])
     if new_user.save
       render json: {status: 'User created successfully'}, status: :created
     else
@@ -15,6 +15,6 @@ class LoginsController < ApplicationController
 
 
   def login_params
-    params.require(:login).permit(:email, :password, :user_type, :profiles => [:name, :phone])
+    params.permit(:email, :password, :user_type)
   end
 end
