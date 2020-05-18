@@ -13,13 +13,18 @@ class ProfilesController < ApplicationController
 
   def update_info
     if params[:profile] = 'personal'
-      profile = Profile.update(params[:id], profile_params)
+      profile = Profile.where(id: params[:id]).first
+      profile.update_attributes(profile_params)
+      if !profile.save
+        render json: { errors: profile.errors.full_messages }, status: :bad_request
+      else
+        render json: { message: "Profile info updated." }, status: :ok
+      end
     elsif params[:profile] = 'payments'
       #TODO Albert: Add user payments info part
     else
       profile = nil
     end
-    render json: { message: "Profile info updated." }, status: :ok
   end
 
   def profile_params
