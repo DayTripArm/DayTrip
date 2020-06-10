@@ -1,9 +1,9 @@
 class ProfilesController < ApplicationController
   #TODO Albert: Add GET and POST methods to retrieve and update profile info
   def get_info
-    if params[:profile] = 'personal'
-      profile = Profile.select(Profile.attribute_names - ['login_id']).where(id: params[:id]).first
-    elsif params[:profile] = 'payments'
+    if params[:profile] == 'personal'
+      profile = Login.exclude_fields.joins(:profile).where(id: params[:id]).first
+    elsif params[:profile] == 'payments'
       #TODO Albert: Add user payments info part
     else
       profile = nil
@@ -28,7 +28,7 @@ class ProfilesController < ApplicationController
       else
         render json: { message: "Password has been updated." }, status: :ok
       end
-    elsif params[:profile] = 'payments'
+    elsif params[:profile] == 'payments'
       #TODO Albert: Add user payments info part
     else
       profile = nil

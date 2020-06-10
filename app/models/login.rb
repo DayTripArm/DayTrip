@@ -5,7 +5,7 @@ class Login < ApplicationRecord
   validates :email, presence: true, uniqueness: true
   validates :email, format: { with: URI::MailTo::EMAIL_REGEXP }
   validates :password, length: { minimum: 6 }
-
+  scope :exclude_fields, ->  { select( Login.attribute_names + Profile.attribute_names - [ 'login_id', 'password_digest', 'created_at', 'updated_at'] ) }
   def self.from_omniauth(access_token)
     data = access_token.info
     user = Login.where(email: data['email']).first

@@ -5,7 +5,7 @@ class LoginsController < ApplicationController
     new_user = Login.new(login_params)
     new_user.build_profile(name: params[:name], phone: params[:phone])
     if new_user.save
-      render json: {status: 'User created successfully'}, status: :created
+      render json: {status: 'User created successfully', payload: payload(new_user)}, status: :created
     else
       render json: { errors: new_user.errors.full_messages }, status: :bad_request
     end
@@ -16,5 +16,14 @@ class LoginsController < ApplicationController
 
   def login_params
     params.permit(:email, :password, :user_type)
+  end
+
+  def payload(user)
+    return nil unless user and user.id
+    {
+        auth_token: JsonWebToken.encode({id: user.id, email: user.email}, 5.minutes.from_now),
+        refresh_token: JsonWebToken.encode({id: user.id, email: user.email}, 15.minutes.from_now),
+        user: {id: user.id, email: user.email}
+    }
   end
 end
