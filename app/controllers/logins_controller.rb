@@ -23,7 +23,7 @@ class LoginsController < ApplicationController
     {
         auth_token: JsonWebToken.encode({id: user.id, email: user.email}, 5.minutes.from_now),
         refresh_token: JsonWebToken.encode({id: user.id, email: user.email}, 15.minutes.from_now),
-        user: {id: user.id, email: user.email}
+        user: {id: user.id, email: user.email, user_type: user.user_type}
     }
   end
 end
