@@ -13,7 +13,18 @@
 @import "active_admin/base";
 
 @import "wigu/active_admin_theme";
+@import "trix/dist/trix";
 
+.active_admin {
+  form trix-editor {
+    margin-left: 20.5%;
+    width: calc(80% - 35px);
+  }
+  form trix-toolbar {
+    margin-left: 20.5%;
+    width: calc(80% - 35px);
+  }
+}
 // Overriding any non-variable SASS must be done after the fact.
 // For example, to change the default status-tag color:
 //
