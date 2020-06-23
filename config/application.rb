@@ -11,7 +11,7 @@ module Daytrip
   class Application < Rails::Application
     # Initialize configuration defaults for originally generated Rails version.
     config.load_defaults 6.0
-
+    config.time_zone = 'Yerevan'
     config.middleware.use Rack::Cors do
       allow do
         origins '*'
