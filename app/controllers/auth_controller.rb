@@ -1,10 +1,16 @@
 class AuthController < ApplicationController
   def login
-    user = Login.find_by(email: params[:email])
-    if user && user.authenticate(params[:password])
-      render json: payload(user)
+    unless params[:email].blank?
+      user = Login.find_by(email: params[:email])
+      if user && user.authenticate(params[:password])
+        render json: payload(user)
+      elsif !user
+        render json: {errors: 'Incorrect Username'}, status: :unauthorized
+      else
+        render json: {errors: 'Incorrect Username/Password'}, status: :unauthorized
+      end
     else
-      render json: {errors: 'Invalid Username/Password'}, status: :unauthorized
+      render json: {errors: 'Incorrect Username'}, status: :unauthorized
     end
   end
 
