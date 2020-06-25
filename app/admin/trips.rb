@@ -15,7 +15,7 @@ ActiveAdmin.register Trip do
   form do |f|
     f.inputs do
       f.input :title
-      f.rich_text_area :content
+      f.input :content, as: :text
       f.input :is_published, label: 'Published'
     end
     f.actions

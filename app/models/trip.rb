@@ -1,6 +1,4 @@
 class Trip < ApplicationRecord
-  include ActionText::Attachable
-  has_rich_text :content
 
   before_create :set_published
   before_update :set_published
