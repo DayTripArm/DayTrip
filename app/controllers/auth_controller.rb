@@ -1,17 +1,13 @@
 class AuthController < ApplicationController
   def login
-    unless params[:email].blank?
       user = Login.find_by(email: params[:email])
       if user && user.authenticate(params[:password])
         render json: payload(user)
-      elsif !user
-        render json: {errors: 'Incorrect Username'}, status: :unauthorized
+      elsif user && !user.authenticate(params[:password])
+        render json: {errors: { password: I18n.t('sign_in.incorrect_password') }}, status: :unauthorized
       else
-        render json: {errors: 'Incorrect Username/Password'}, status: :unauthorized
+        render json: {errors: { general: I18n.t('sign_in.incorrect_creds') }}, status: :unauthorized
       end
-    else
-      render json: {errors: 'Incorrect Username'}, status: :unauthorized
-    end
   end
 
   private

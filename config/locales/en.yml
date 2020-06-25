@@ -1,5 +1,8 @@
 en:
   hello: "Hello world"
+  sign_in:
+    incorrect_creds: 'Incorrect Username/Password'
+    incorrect_password: 'Incorrect Password'
   activerecord:
     attributes:
       profile:
