@@ -1,22 +1,19 @@
-ActiveAdmin.register HitTheRoad do
-  permit_params :title, :description, :published, :image
+ActiveAdmin.register Destination do
+  permit_params :title, :description, :image
 
   index do
     column :title
     column :created_at
-    column :published
     actions
   end
 
   filter :title
-  filter :published
 
   form do |f|
     f.inputs do
       f.input :title
       f.input :description, as: :text
       f.input :image
-      f.input :published
     end
     f.actions
   end
@@ -28,7 +25,6 @@ ActiveAdmin.register HitTheRoad do
       row :image do |ad|
         image_tag ad.image.url
       end
-      row :published
       row :created_at
       row :updated_at
     end

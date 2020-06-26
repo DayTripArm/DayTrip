@@ -1,5 +1,5 @@
-ActiveAdmin.register HitTheRoad do
-  permit_params :title, :description, :published, :image
+ActiveAdmin.register Hero do
+  permit_params :title, :description, :btn_title, :btn_link, :published, :image
 
   index do
     column :title
@@ -15,6 +15,8 @@ ActiveAdmin.register HitTheRoad do
     f.inputs do
       f.input :title
       f.input :description, as: :text
+      f.input :btn_title, label: 'Button Title'
+      f.input :btn_link, label: 'Button Link'
       f.input :image
       f.input :published
     end
@@ -25,6 +27,8 @@ ActiveAdmin.register HitTheRoad do
     attributes_table do
       row :title
       row :description
+      row :btn_title
+      row :btn_link
       row :image do |ad|
         image_tag ad.image.url
       end
