@@ -4,6 +4,7 @@ class AddHitTheRoads < ActiveRecord::Migration[6.0]
       t.string :title,  null: false, default: ""
       t.text :description, null: false, default: ""
       t.string :image, null: false, default: ""
+      t.boolean :published, null: false, default: false
       t.datetime :created_at
       t.datetime :updated_at
     end
