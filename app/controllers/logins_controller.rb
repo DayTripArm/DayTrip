@@ -2,6 +2,9 @@ class LoginsController < ApplicationController
   before_action :authenticate_request, except: [:sign_up]
 
   def sign_up
+    if params[:user_type] == 2
+      params[:is_prereg] = true
+    end
     new_user = Login.new(login_params)
     new_user.build_profile(name: params[:name], phone: params[:phone])
     if new_user.save
@@ -15,7 +18,7 @@ class LoginsController < ApplicationController
 
 
   def login_params
-    params.permit(:email, :password, :user_type)
+    params.permit(:email, :password, :user_type, :is_prereg)
   end
 
   def payload(user)
