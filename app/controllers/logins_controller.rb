@@ -8,7 +8,7 @@ class LoginsController < ApplicationController
     new_user = Login.new(login_params)
     new_user.build_profile(name: params[:name], phone: params[:phone])
     if new_user.save
-      render json: {status: 'User created successfully', payload: payload(new_user)}, status: :created
+      render json: payload(new_user), status: :ok
     else
       render json: { errors: new_user.errors.full_messages }, status: :bad_request
     end
