@@ -13,7 +13,7 @@ class ProfilesController < ApplicationController
 
   def update_info
     if params[:profile] == 'personal'
-      profile = Profile.where(id: params[:id]).first
+      profile = Profile.where(login_id: params[:id]).first
       profile.update_attributes(profile_params)
       if !profile.save
         render json: { errors: profile.errors.full_messages }, status: :bad_request
