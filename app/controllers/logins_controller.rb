@@ -10,7 +10,9 @@ class LoginsController < ApplicationController
     if new_user.save
       render json: payload(new_user), status: :ok
     else
-      render json: { errors: new_user.errors.full_messages }, status: :bad_request
+      attrs = new_user.errors.messages.keys
+      errors = new_user.errors.messages.transform_values!.with_index { |msg, ind| ["#{attrs[ind].capitalize} #{msg[0]}" }
+      render json: new_user.errors.messages, status: :bad_request
     end
   end
 

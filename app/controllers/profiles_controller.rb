@@ -22,7 +22,7 @@ class ProfilesController < ApplicationController
       end
     elsif params[:profile] == 'login'
       login = Login.where(id: params[:id]).first
-      login.update_attributes(password: params[:password])
+      login.update_attributes(password: params[:profile_info][:password])
       if !login.save
         render json: { errors: login.errors.full_messages }, status: :bad_request
       else
@@ -36,6 +36,6 @@ class ProfilesController < ApplicationController
   end
 
   def profile_params
-    params.require(:personal).permit(:name, :gender, :date_of_birth, :phone, :about, :location, :languages, :work, :is_deactivated, :id)
+    params.require(:profile_info).permit(:name, :gender, :date_of_birth, :phone, :about, :location, :languages, :work, :is_deactivated, :id)
   end
 end
