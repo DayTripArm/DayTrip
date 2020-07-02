@@ -32,6 +32,8 @@ gem 'activeadmin', github: 'activeadmin/activeadmin'
 gem 'active_admin_theme'
 gem 'bourbon'
 
+gem 'activeadmin_quill_editor'
+
 gem 'carrierwave', '~> 2.0'
 # Use Json Web Token (JWT) for token based authentication
 gem 'jwt'

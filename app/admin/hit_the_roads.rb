@@ -14,7 +14,7 @@ ActiveAdmin.register HitTheRoad do
   form do |f|
     f.inputs do
       f.input :title
-      f.input :description, as: :text
+      f.input :description, as: :quill_editor
       f.input :image
       f.input :published
     end
@@ -24,9 +24,11 @@ ActiveAdmin.register HitTheRoad do
   show do
     attributes_table do
       row :title
-      row :description
-      row :image do |ad|
-        image_tag ad.image.url
+      row :description do | htr |
+        htr.description.html_safe
+      end
+      row :image do |htr|
+        image_tag htr.image.url
       end
       row :published
       row :created_at
