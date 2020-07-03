@@ -17,6 +17,8 @@ Rails.application.routes.draw do
 
       # Driver Infos API calls routes
       post "/driver_infos", to: "driver_infos#create"
+      get "/driver_infos/:id", to: "driver_infos#edit"
+      put "/driver_infos/:id", to: "driver_infos#update"
 
       # Get list from backoffice
       # Directions list
