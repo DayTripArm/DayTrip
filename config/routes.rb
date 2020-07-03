@@ -21,5 +21,6 @@ Rails.application.routes.draw do
       # Get list from backoffice
       # Directions list
       get "/destinations", to: "destinations#index"
+      get "/tips", to: "tips#index"
    end
 end
