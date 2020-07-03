@@ -2,6 +2,7 @@ class AddTips < ActiveRecord::Migration[6.0]
   def change
     create_table :tip_categories do |t|
       t.string :title,  null: false, default: ""
+	  t.integer :category_type, null: false
     end
 
     create_table :tips do |t|
