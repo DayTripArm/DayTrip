@@ -1,7 +1,11 @@
 class TipsController < ApplicationController
   def index
+    tips_obj = {}
     tips_category = TipCategory.where(category_type: params[:type]).first
-    tips = tips_category.tips.exclude_tip_fields
-    render json: {title: tips_category.title, tips: tips}, status: :ok
+    unless tips_category.blank?
+      tips = tips_category.tips.exclude_tip_fields
+      tips_obj = {title: tips_category.title, tips: tips}
+    end
+    render json: tips_obj, status: :ok
   end
 end
