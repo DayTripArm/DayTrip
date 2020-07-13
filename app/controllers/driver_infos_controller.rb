@@ -5,21 +5,24 @@ class DriverInfosController < ApplicationController
     begin
       params[:driver_info] = JSON.parse(params[:driver_info])
       params[:profile_info] = JSON.parse(params[:profile_info])
+      unless params[:driver_info].blank? && params[:profile_info].blank?
+        login = Login.where(id: params[:login_id]).first
 
-      login = Login.where(id: params[:login_id]).first
+        driver_info = DriverInfo.new
+        profile = Profile.find_by(login_id: params[:login_id])
+        driver_info.assign_attributes(driver_info_params.merge({login_id: params[:login_id]}))
+        profile.assign_attributes(profile_info_params)
+        driver_info.save!
+        profile.save!
+        Photo::FILE_TYPES.each do |type, type_int|
+            file_save = PhotosHelper::upload_and_save_photos(login, type_int, type, params[type]) unless params[type].blank?
+        end
+        login.update_attribute(:is_prereg, false) if params[:prereg_finish]
 
-      driver_info = DriverInfo.new
-      profile = Profile.find_by(login_id: params[:login_id])
-      driver_info.assign_attributes(driver_info_params.merge({login_id: params[:login_id]}))
-      profile.assign_attributes(profile_info_params)
-      driver_info.save
-      profile.save
-      Photo::FILE_TYPES.each do |type, type_int|
-          file_save = PhotosHelper::upload_and_save_photos(login, type_int, type, params[type]) unless params[type].blank?
+        render json: {message: "Driver information has been saved."}, status: :ok
+      else
+        render json: {message: "Please fill in required fields"}, status: :ok
       end
-      login.update_attributes({is_prereg: false}) if params[:prereg_finish]
-
-      render json: {message: "Driver information has been saved."}, status: :ok
     rescue StandardError, ActiveRecordError => e
       errors << e.message if e.message.blank?
       render json: errors, status: :internal_server_error
