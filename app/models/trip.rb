@@ -1,10 +1,7 @@
 class Trip < ApplicationRecord
+  has_many :destinations_trips
+  has_many :destinations, through: :destinations_trips
 
-  before_create :set_published
-  before_update :set_published
-
-  # Set Published At value for trip
-  def set_published
-    self.published_at = DateTime.now if is_published?
-  end
+  mount_uploaders :images, ImageUploader
+  mount_uploaders :map_image, ImageUploader
 end

@@ -19,3 +19,19 @@
 // For example, to change the default status-tag color:
 //
 //   .status_tag { background: #6090DB; }
+
+//Custom CSS styles for back office
+
+select[multiple] > option {
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  line-height: 1.5em !important;
+  padding: 5px;
+  font-size: 1.2em;
+  color: #323537;
+  border: 1px solid #e8e8e8;
+  border-radius: 5px;
+}
+.filter_form_field select {
+  padding: 5px;
+  border-radius: 3px;
+}
