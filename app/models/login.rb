@@ -1,7 +1,7 @@
 class Login < ApplicationRecord
   has_one :profile
   has_one :driver_info
-  has_one :customer_file
+  has_many :photos
   accepts_nested_attributes_for :profile
   has_secure_password validations: false
   validates :email, presence: true, uniqueness: true
