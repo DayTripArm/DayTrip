@@ -20,9 +20,13 @@ Rails.application.routes.draw do
       get "/driver_infos/:id", to: "driver_infos#edit"
       put "/driver_infos/:id", to: "driver_infos#update"
 
-      # Get list from backoffice
-      # Directions list
+      # Get lists from backoffice
+      # Directions and tips lists
       get "/destinations", to: "destinations#index"
       get "/tips", to: "tips#index"
+
+      # API to retrieve 'Heroes' and 'Hit the Road' section data(images and texts)
+      get "/heroes", to: "heroes#index"
+      get "/hit_the_road", to: "hit_the_roads#index"
    end
 end
