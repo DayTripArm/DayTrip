@@ -1,22 +1,18 @@
 class TripsController < ApplicationController
-
-  def new
-    @trip = Trip.new
+  def index
+    trips = Trip.active_trips
+    render json: trips, status: :ok
   end
 
-  def create
-    trip = Trip.create(trip_params)
-    redirect_to collection_url
-  end
-
-  def show
-    @trip = Trip.find(params[:id])
-  end
-
-  private
-
-  def trip_params
-    params.require(:trip).permit(:title, :content, :is_published)
+  def trip_detail
+    if params[:id]
+      begin
+        trip = Trip.find_by(:id => params[:id])
+      rescue StandartError => e
+        render json: e.messages, status: :ok
+      end
+    end
+    render json: trip, status: :ok
   end
 
 end
