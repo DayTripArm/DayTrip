@@ -1,6 +1,12 @@
 class TripsController < ApplicationController
   def index
     trips = Trip.active_trips
+    if params[:query]
+      trips = trips.searched_trips(params[:query])
+    end
+    if params[:top_choice]
+      trips = trips.filter_trips(params[:limit], params[:offset])
+    end
     render json: trips, status: :ok
   end
 
