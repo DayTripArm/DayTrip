@@ -1,5 +1,5 @@
 ActiveAdmin.register Trip do
-  permit_params :title, :trip_duration, :start_location, :agenda, :published, destination_ids: [],  map_image: [],  images: []
+  permit_params :title, :trip_duration, :start_location, :agenda, :published,  destination_ids: [], map_image: [],  images: []
 
   index do
     column :title
@@ -21,7 +21,7 @@ ActiveAdmin.register Trip do
       f.input :start_location
       f.input :agenda, as: :quill_editor
       f.input :map_image, as: :file, input_html: { multiple: true }
-      f.input :destinations, collection: Destination.all.collect {|x| [x.title, x.id]}, as: :select, multiple: true, input_html: { style: "width: 250px;",  size:5}
+      f.input :destination_ids, as: :select, multiple: true, :collection => Destination.all.collect {|destination| [destination.title, destination.id]}, input_html: { style: "width: 250px;",  size:5}
       f.input :published
     end
     f.actions
@@ -49,6 +49,15 @@ ActiveAdmin.register Trip do
           trip.map_image.each do |image|
             li do
               image_tag(image.url)
+            end
+          end
+        end
+      end
+      row 'Destinations' do
+        ul do
+          trip.destinations_in_trips.each do |dip|
+            li do
+              dip.destination.title
             end
           end
         end

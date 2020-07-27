@@ -11,12 +11,11 @@ class AddTrips < ActiveRecord::Migration[6.0]
         t.datetime :created_at
         t.datetime :updated_at
       end
-      create_table :destinations_trips, :id => false do |t|
-        t.integer :destination_id
-        t.integer :trip_id
+      create_join_table :destinations, :trips, table_name: :destinations_in_trips do |t|
+        t.index :destination_id
+        t.index :trip_id
       end
 
       add_index :trips, :title,  unique: true
-      add_index :destinations_trips, [:destination_id, :trip_id]
   end
 end
