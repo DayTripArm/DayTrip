@@ -8,6 +8,7 @@ class AddTrips < ActiveRecord::Migration[6.0]
         t.text :agenda, null: false, default: ""
         t.text :map_image, array: true
         t.boolean :published, null: false, default: false
+        t.boolean :is_top_choice, null: false, default: false
         t.datetime :created_at
         t.datetime :updated_at
       end

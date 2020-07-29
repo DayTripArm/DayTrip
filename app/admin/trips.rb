@@ -1,13 +1,22 @@
 ActiveAdmin.register Trip do
   permit_params :title, :trip_duration, :start_location, :agenda, :published,  destination_ids: [], map_image: [],  images: []
 
+  scope "All", :all
+  scope "Top Choices", :top_choices
+
   index do
     column :title
     column :trip_duration
     column :is_published, :label => 'Published'
     column :created_at
     column :published_at
-    actions
+    actions defaults: true do |t|
+      unless t.is_top_choice
+      link_to 'Add to Top Choices', change_top_choice_admin_trip_path(t.id)
+      else
+      link_to 'Remove from Top Choices', change_top_choice_admin_trip_path(t.id)
+      end
+    end
   end
 
   filter :title
@@ -25,6 +34,20 @@ ActiveAdmin.register Trip do
       f.input :published
     end
     f.actions
+  end
+
+  # Define member actions.
+  member_action  :change_top_choice do
+    @trip = Trip.find(params[:id])
+    if @trip.is_top_choice
+      @trip.is_top_choice = false
+      message = "Trip has been removed from Top Choices"
+    else
+      @trip.is_top_choice = true
+      message = "Trip has been added to Top Choices"
+    end
+    @trip.save!
+    redirect_to admin_trips_path, :notice => message
   end
 
   show do
