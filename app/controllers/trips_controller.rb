@@ -4,9 +4,9 @@ class TripsController < ApplicationController
     if params[:query]
       trips = trips.searched_trips(params[:query])
     elsif params[:top_choice]
-      trips = trips.filter_trips(params[:limit], params[:offset])
+      trips = trips.trip_short_info.filter_trips(params[:limit], params[:offset])
     else
-      trips = trips.filter_trips(params[:limit], params[:offset])
+      trips = trips.trip_short_info.filter_trips(params[:limit], params[:offset])
     end
     render json: trips, status: :ok
   end
@@ -26,12 +26,17 @@ class TripsController < ApplicationController
 
   # Save a trips as a traveler
   # POST /save_trip
-  def save_trip
+  def save_unsave_trip
     errors = []
     begin
-      save_trip = SavedTrip.new({login_id: params[:login_id], trip_id: params[:trip_id]})
-      save_trip.save
-      render json: {message: "Your trip has been saved."}, status: :ok
+      if params[:is_save]
+        save_trip = SavedTrip.new({login_id: params[:login_id], trip_id: params[:trip_id]})
+        save_trip.save
+        render json: {message: "Trip saved."}, status: :ok
+      else
+        saved_trip = SavedTrip.where({login_id: params[:login_id], trip_id: params[:trip_id]}).delete_all
+        render json: {message: "Trip unsaved."}, status: :ok
+      end
     rescue StandardError, ActiveRecordError => e
       errors << e.message if e.message.blank?
       render json: errors, status: :ok

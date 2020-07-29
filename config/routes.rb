@@ -33,7 +33,7 @@ Rails.application.routes.draw do
      get "/trips", to: "trips#index"
      get "/trips/:id", to: "trips#trip_detail"
      # Saved trips APIs
-     post "/save_trip", to: "trips#save_trip"
+     post "/save_trip", to: "trips#save_unsave_trip"
      get "/saved_trips", to: "trips#get_saved_trips"
    end
 end
