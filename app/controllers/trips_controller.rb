@@ -3,8 +3,8 @@ class TripsController < ApplicationController
     trips = Trip.active_trips
     if params[:query]
       trips = trips.searched_trips(params[:query])
-    elsif params[:top_choice]
-      trips = trips.trip_short_info.filter_trips(params[:limit], params[:offset])
+    elsif params[:is_top_choice] == 'true'
+      trips = trips.trip_short_info.top_choices.filter_trips(params[:limit], params[:offset])
     else
       trips = trips.trip_short_info.filter_trips(params[:limit], params[:offset])
     end
