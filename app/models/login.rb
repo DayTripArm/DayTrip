@@ -4,6 +4,7 @@ class Login < ApplicationRecord
   has_many :photos
   has_many :saved_trips
   has_many :trips, through: :saved_trips
+  has_many :reviews
   accepts_nested_attributes_for :profile
 
   has_secure_password validations: false

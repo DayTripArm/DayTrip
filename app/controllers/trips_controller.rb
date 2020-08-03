@@ -3,10 +3,9 @@ class TripsController < ApplicationController
     trips = Trip.active_trips
     if params[:query]
       trips = trips.searched_trips(params[:query])
-    elsif params[:is_top_choice] == 'true'
-      trips = trips.trip_short_info.top_choices.filter_trips(params[:limit], params[:offset])
     else
-      trips = trips.trip_short_info.filter_trips(params[:limit], params[:offset])
+      trips = trips.joins(:reviews).filter_trips(params[:limit], params[:offset])
+      trips.top_choices if params[:is_top_choice] == 'true'
     end
     render json: trips, status: :ok
   end
@@ -15,9 +14,16 @@ class TripsController < ApplicationController
     if params[:id]
       begin
         trip = Trip.active_trips.joins(:destinations_in_trips, :destinations)
-                   .where(id: params[:id]).distinct().first
-
-        render json: { trip: trip, destinations: trip.destinations}, status: :ok
+                   .where(id: params[:id]).first
+        render json: {
+            trip: trip,
+            destinations: trip.destinations,
+            reviews: trip.reviews,
+            is_saved: trip.saved_trips.blank? ? false : true,
+            rewview_stats: {
+                count: trip.reviews.count,
+                rate:  trip.reviews.average(:rate) || "0.0"
+            }}, status: :ok
       rescue StandardError => e
         render json: e.message, status: :ok
       end
@@ -50,5 +56,21 @@ class TripsController < ApplicationController
     rescue StandardError, ActiveRecordError => e
       render json: e.message, status: :ok
     end
+  end
+
+  def add_review
+    begin
+       trip = Trip.find_by(params[:id])
+       new_review = trip.reviews.new(review_params)
+       new_review.save!
+       render json: {message: "Your review has been saved."}, status: :ok
+    rescue StandardError => e
+       render json: e.message, status: :ok
+    end
+  end
+
+  private
+  def review_params
+    params.except(:trip).require(:review).permit(:login_id, :trip_id, :rate, :review_text)
   end
 end
