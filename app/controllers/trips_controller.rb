@@ -1,13 +1,25 @@
 class TripsController < ApplicationController
   def index
+    trips_arr = Array.new()
     trips = Trip.active_trips
     if params[:query]
       trips = trips.searched_trips(params[:query])
+      trips_arr = trips
     else
-      trips = trips.joins(:reviews).filter_trips(params[:limit], params[:offset])
-      trips.top_choices if params[:is_top_choice] == 'true'
+      trips = trips.filter_trips(params[:limit], params[:offset])
+      trips = trips.top_choices if params[:is_top_choice] === 'true'
+      trips.each_with_index do |trip, index|
+        trips_arr[index] = {
+            trip: trip,
+            is_saved: TripsHelper::is_favourite(trip),
+            review_stats: {
+                count: TripsHelper::trip_reviews_count(trip),
+                rate:  TripsHelper::trip_reviews_rate(trip)
+            }
+        }
+      end
     end
-    render json: trips, status: :ok
+    render json: trips_arr, status: :ok
   end
 
   def trip_detail
@@ -19,10 +31,10 @@ class TripsController < ApplicationController
             trip: trip,
             destinations: trip.destinations,
             reviews: trip.reviews,
-            is_saved: trip.saved_trips.blank? ? false : true,
-            rewview_stats: {
-                count: trip.reviews.count,
-                rate:  trip.reviews.average(:rate) || "0.0"
+            is_saved: TripsHelper::is_favourite(trip),
+            review_stats: {
+                count: TripsHelper::trip_reviews_count(trip),
+                rate:  TripsHelper::trip_reviews_rate(trip)
             }}, status: :ok
       rescue StandardError => e
         render json: e.message, status: :ok

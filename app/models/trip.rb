@@ -12,6 +12,6 @@ class Trip < ApplicationRecord
 
   scope :active_trips, ->  { where(:published => true) }
   scope :searched_trips, ->(query) { select("id, title, images").where("title like ? ", "%#{query}%") }
-  scope :filter_trips,-> (limit,offset) { limit(limit).offset(offset) }
+  scope :filter_trips,-> (limit,offset) { select("id, title, images, trip_duration").limit(limit).offset(offset) }
   scope :top_choices, ->  { where(:is_top_choice => true) }
 end
