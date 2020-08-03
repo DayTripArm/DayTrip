@@ -1,19 +1,22 @@
 ActiveAdmin.register Destination do
-  permit_params :title, :description, :image
+  permit_params :title, :description, :published, :image
 
   index do
     column :title
+    column :published
     column :created_at
     actions
   end
 
   filter :title
+  filter :published
 
   form do |f|
     f.inputs do
       f.input :title
       f.input :description, as: :quill_editor
       f.input :image
+      f.input :published
     end
     f.actions
   end
@@ -27,8 +30,7 @@ ActiveAdmin.register Destination do
       row :image do |dst|
         image_tag dst.image.url
       end
-      row :created_at
-      row :updated_at
+      row :published
     end
   end
 

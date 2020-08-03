@@ -1,5 +1,4 @@
 class Destination < ApplicationRecord
-
   has_many :destinations_in_trips
   has_many :trips, through: :destinations_in_trips
 
@@ -9,6 +8,4 @@ class Destination < ApplicationRecord
   validates :title, presence: true
   validates :description, presence: true
   validates :image, presence: true
-
-
 end

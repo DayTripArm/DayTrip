@@ -7,9 +7,8 @@ ActiveAdmin.register Trip do
   index do
     column :title
     column :trip_duration
-    column :is_published, :label => 'Published'
+    column :published
     column :created_at
-    column :published_at
     actions defaults: true do |t|
       unless t.is_top_choice
       link_to 'Add to Top Choices', change_top_choice_admin_trip_path(t.id)
@@ -20,7 +19,7 @@ ActiveAdmin.register Trip do
   end
 
   filter :title
-  filter :is_published
+  filter :published
 
   form do |f|
     f.inputs do
