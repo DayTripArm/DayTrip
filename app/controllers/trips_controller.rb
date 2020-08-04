@@ -47,13 +47,17 @@ class TripsController < ApplicationController
   def save_unsave_trip
     errors = []
     begin
-      if params[:is_save]
-        save_trip = SavedTrip.new({login_id: params[:login_id], trip_id: params[:trip_id]})
-        save_trip.save
-        render json: {message: "Trip saved."}, status: :ok
+      if !params[:login_id].blank? && !params[:trip_id].blank? && params[:login_id]>0 && params[:trip_id]>0
+          if params[:is_save]
+            save_trip = SavedTrip.new({login_id: params[:login_id], trip_id: params[:trip_id]})
+            save_trip.save
+            render json: {message: "Trip saved."}, status: :ok
+          else
+            saved_trip = SavedTrip.where({login_id: params[:login_id], trip_id: params[:trip_id]}).delete_all
+            render json: {message: "Trip unsaved."}, status: :ok
+          end
       else
-        saved_trip = SavedTrip.where({login_id: params[:login_id], trip_id: params[:trip_id]}).delete_all
-        render json: {message: "Trip unsaved."}, status: :ok
+        render json: {message: "Somthing went wrong. Can't save the trip."}, status: :ok
       end
     rescue StandardError, ActiveRecordError => e
       errors << e.message if e.message.blank?
