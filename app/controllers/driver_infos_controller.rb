@@ -24,7 +24,7 @@ class DriverInfosController < ApplicationController
         render json: {message: "Please fill in required fields"}, status: :ok
       end
     rescue StandardError, ActiveRecordError => e
-      errors << e.message if e.message.blank?
+      errors << e.message unless e.message.blank?
       render json: errors, status: :internal_server_error
     end
   end
@@ -32,28 +32,37 @@ class DriverInfosController < ApplicationController
   # Retrieve all driver related information
   def edit
     drivers_info_obj = {}
-    driver_info = DriverInfo.where(login_id: params[:id])
-    car_photos = Photo.car_photos(params[:id])
-    drivers_info_obj = {
-        car_details: {
-            car_info: driver_info.car_details.first,
-            car_photos: car_photos
-        },
-        more_details: driver_info.more_details.first,
-        prices: driver_info.prices.first
-    }
-    render json: drivers_info_obj, status: :ok
+    begin
+      errors = []
+      driver_info = DriverInfo.find_by(login_id: params[:id])
+      unless driver_info.blank?
+        car_photos = Photo.car_photos(params[:id])
+        drivers_info_obj = {
+            car_details: {
+                car_info: driver_info.car_details.first,
+                car_photos: car_photos
+            },
+            more_details: driver_info.more_details.first,
+            prices: driver_info.prices.first
+        }
+      end
+      render json: drivers_info_obj, status: :ok
+    rescue StandardError, ActiveRecordError => e
+      errors << e.message unless e.message.blank?
+      render json: errors, status: :internal_server_error
+    end
   end
 
   # Update all driver related information
   def update
     begin
       errors = []
-      unless params[:car_info].empty?
+      # TODO add update car photos
+      #file_save = PhotosHelper::upload_and_save_photos(login, type_int, "car_photos", params[:car_photos]) unless params[:car_photos].blank?
+
+      unless params[:car_info].blank?
         driver_info = DriverInfo.find_by({login_id: params[:login_id]})
-        driver_info.assign_attributes(params[:car_info])
-        # TODO add update car photos
-        #file_save = PhotosHelper::upload_and_save_photos(login, type_int, car_photos, params[:car_photos]) unless params[:car_photos].blank?
+        driver_info.update_attributes(car_info_params)
         if driver_info.save
           render json: {message: "Driver information has been updated."}, status: :ok
         else
@@ -61,8 +70,7 @@ class DriverInfosController < ApplicationController
         end
       end
     rescue StandardError, ActiveRecordError => e
-      puts "\n\n  e  #{e.inspect}   \n\n"
-      errors << e.message if e.message.blank?
+      errors << e.message unless e.message.blank?
       render json: errors, status: :internal_server_error
     end
   end
@@ -73,5 +81,9 @@ class DriverInfosController < ApplicationController
 
   def profile_info_params
     params.require(:profile_info).permit(:gender, :date_of_birth, :languages, :about, :work, :location)
+  end
+
+  def car_info_params
+    params.require(:car_info).permit(:car_type, :car_mark, :car_model, :car_year, :car_color, :car_seats, :car_specs, :driver_destinations, :tariff1, :tariff2)
   end
 end
