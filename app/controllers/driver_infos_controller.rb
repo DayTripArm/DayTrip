@@ -31,29 +31,39 @@ class DriverInfosController < ApplicationController
 
   # Retrieve all driver related information
   def edit
-    profile = Profile.where({login_id: params[:id]}).first
-    driver_info = DriverInfo.where({login_id: params[:id]}).first
+    drivers_info_obj = {}
+    driver_info = DriverInfo.where(login_id: params[:id])
+    car_photos = Photo.car_photos(params[:id])
     drivers_info_obj = {
-        profile_info: profile,
-        driver_info: driver_info
+        car_details: {
+            car_info: driver_info.car_details.first,
+            car_photos: car_photos
+        },
+        more_details: driver_info.more_details.first,
+        prices: driver_info.prices.first
     }
     render json: drivers_info_obj, status: :ok
   end
 
   # Update all driver related information
   def update
-    driver_info = DriverInfo.find_by({login_id: params[:login_id]})
-    profile = Profile.find_by({login_id: params[:login_id]})
-    driver_info.assign_attributes(driver_info_params.merge({login_id: params[:login_id]}))
-    profile.assign_attributes(profile_info_params)
-    if driver_info.save && profile.save
-      render json: {message: "Driver information has been updated."}, status: :ok
-    else
-      driver_attrs = driver_info.errors.messages.keys
-      profile_attrs = profile.errors.messages.keys if profile.errors.messages.blank?
-      driver_errors = driver_info.errors.messages.transform_values!.with_index { |msg, ind| ["#{driver_attrs[ind].capitalize} #{msg[0]}"] }
-      profile_errors = profile.errors.messages.transform_values!.with_index { |msg, ind| ["#{profile_attrs[ind].capitalize} #{msg[0]}"] } if profile.errors.messages.blank?
-      render json: driver_errors + profile_errors, status: :bad_request
+    begin
+      errors = []
+      unless params[:car_info].empty?
+        driver_info = DriverInfo.find_by({login_id: params[:login_id]})
+        driver_info.assign_attributes(params[:car_info])
+        # TODO add update car photos
+        #file_save = PhotosHelper::upload_and_save_photos(login, type_int, car_photos, params[:car_photos]) unless params[:car_photos].blank?
+        if driver_info.save
+          render json: {message: "Driver information has been updated."}, status: :ok
+        else
+          render json: {message: "Driver information failed to be updated."}, status: :ok
+        end
+      end
+    rescue StandardError, ActiveRecordError => e
+      puts "\n\n  e  #{e.inspect}   \n\n"
+      errors << e.message if e.message.blank?
+      render json: errors, status: :internal_server_error
     end
   end
 
