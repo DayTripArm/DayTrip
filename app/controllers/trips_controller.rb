@@ -11,7 +11,7 @@ class TripsController < ApplicationController
       trips.each_with_index do |trip, index|
         trips_arr[index] = {
             trip: trip,
-            is_saved: TripsHelper::is_favourite(trip),
+            is_saved: TripsHelper::is_favourite(trip, params[:login_id]),
             review_stats: {
                 count: TripsHelper::trip_reviews_count(trip),
                 rate:  TripsHelper::trip_reviews_rate(trip)
@@ -31,7 +31,7 @@ class TripsController < ApplicationController
             trip: trip,
             destinations: trip.destinations,
             reviews: trip.reviews,
-            is_saved: TripsHelper::is_favourite(trip),
+            is_saved: TripsHelper::is_favourite(trip, params[:login_id]),
             review_stats: {
                 count: TripsHelper::trip_reviews_count(trip),
                 rate:  TripsHelper::trip_reviews_rate(trip)

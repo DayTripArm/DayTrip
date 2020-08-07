@@ -7,7 +7,7 @@ module TripsHelper
     trip.reviews.average(:rate) || "0.0"
   end
 
-  def self.is_favourite(trip)
-    trip.saved_trips.blank? ? false : true
+  def self.is_favourite(trip, login_id)
+    trip.saved_trips.where("saved_trips.login_id = ?", login_id).blank? ? false : true
   end
 end
