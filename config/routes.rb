@@ -19,6 +19,7 @@ Rails.application.routes.draw do
       post "/driver_infos", to: "driver_infos#create"
       get "/driver_infos/:id", to: "driver_infos#edit"
       put "/driver_infos/:id", to: "driver_infos#update"
+      delete "/driver_infos/:id", to: "driver_infos#delete_photo"
 
       # Get lists from backoffice
       # Directions and tips lists

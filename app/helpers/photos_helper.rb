@@ -16,4 +16,18 @@ module PhotosHelper
       `chmod -R 777 "#{dest_path}"`
     end
   end
+
+  # Get full path of photo by name
+  def self.get_photo_full_path(name, file_type, login_id)
+    dir_path = File.join("public", "uploads", file_type, login_id.to_s)
+    dest_path = File.join(dir_path, name)
+    return dest_path
+  end
+
+  # Remove photo from DB and file system
+  def self.remove_photos(login, photo)
+    path = self.get_photo_full_path(photo.name, photo.file_type, login.id)
+    login.photos.where(id: photo.id).delete_all
+    FileUtils.rm dest_path
+  end
 end
