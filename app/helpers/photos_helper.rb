@@ -26,8 +26,8 @@ module PhotosHelper
 
   # Remove photo from DB and file system
   def self.remove_photos(login, photo)
-    path = self.get_photo_full_path(photo.name, photo.file_type, login.id)
-    login.photos.where(id: photo.id).delete_all
-    FileUtils.rm dest_path
+    path = self.get_photo_full_path(photo[:name], Photo::FILE_TYPES.key(photo[:file_type]), login.id)
+    login.photos.where(id: photo[:id]).delete_all
+    FileUtils.rm path
   end
 end
