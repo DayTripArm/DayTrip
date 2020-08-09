@@ -92,6 +92,7 @@ class DriverInfosController < ApplicationController
       errors = []
       unless params[:id].blank?
         PhotosHelper::remove_photos(Login.where({id: params[:id]}).first, params[:photo])
+        render json: {message: "Photo has been deleted."}, status: :ok
       end
     rescue StandardError, ActiveRecordError => e
       errors << e.message unless e.message.blank?
