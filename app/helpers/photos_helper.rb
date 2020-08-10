@@ -19,7 +19,7 @@ module PhotosHelper
 
   # Get full path of photo by name
   def self.get_photo_full_path(name, file_type, login_id)
-    dir_path = File.join("public", "uploads", file_type, login_id.to_s)
+    dir_path = File.join("uploads", file_type, login_id.to_s)
     dest_path = File.join(dir_path, name)
     return dest_path
   end
