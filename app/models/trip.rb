@@ -11,7 +11,11 @@ class Trip < ApplicationRecord
   self.ignored_columns = %w(created_at updated_at)
 
   scope :active_trips, ->  { where(:published => true) }
-  scope :searched_trips, ->(query) { select("id, title, images").where("title like ? ", "%#{query}%") }
+  scope :searched_trips, ->(query) {
+        select("trips.id, trips.title, trips.images")
+        .joins(:destinations)
+        .where("trips.title ilike  :search OR trips.agenda ilike :search OR destinations.title ilike :search OR destinations.description ilike :search", search: "%#{query}%")
+        .distinct() }
   scope :filter_trips,-> (limit,offset) { select("id, title, images, trip_duration, is_top_choice").limit(limit).offset(offset) }
   scope :top_choices, ->  { where(:is_top_choice => true) }
 end
