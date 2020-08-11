@@ -1,5 +1,5 @@
 ActiveAdmin.register Trip do
-  permit_params :title, :trip_duration, :start_location, :agenda, :published,  destination_ids: [], map_image: [],  images: []
+  permit_params :title, :trip_duration, :start_location, :agenda, :published, destinations_in_trips_attributes: [:id, :stops_title, :trip_id, :destination_id, :_destroy], map_image: [],  images: []
 
   scope "All", :all
   scope "Top Choices", :top_choices
@@ -29,8 +29,15 @@ ActiveAdmin.register Trip do
       f.input :start_location
       f.input :agenda, as: :quill_editor
       f.input :map_image, as: :file, input_html: { multiple: true }
-      f.input :destination_ids, as: :select, multiple: true, :collection => Destination.all.collect {|destination| [destination.title, destination.id]}, input_html: { style: "width: 250px;",  size:5}
       f.input :published
+    end
+    f.inputs 'Choose Trip Destinations' do
+      f.has_many :destinations_in_trips,
+                 new_record: 'Add Destination',
+                 allow_destroy: true do |b|
+        b.input :stops_title
+        b.input :destination_id, as: :select, :collection => Destination.all.collect {|destination| [destination.title, destination.id]}, input_html: { style: "width: 250px; height: 30px"}
+      end
     end
     f.actions
   end
@@ -79,7 +86,7 @@ ActiveAdmin.register Trip do
         ul do
           trip.destinations_in_trips.each do |dip|
             li do
-              dip.destination.title
+              dip.destination.title + " - " +  dip.stops_title
             end
           end
         end

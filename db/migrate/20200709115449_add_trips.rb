@@ -12,9 +12,10 @@ class AddTrips < ActiveRecord::Migration[6.0]
         t.datetime :created_at
         t.datetime :updated_at
       end
-      create_join_table :destinations, :trips, table_name: :destinations_in_trips do |t|
-        t.index :destination_id
-        t.index :trip_id
+      create_table :destinations_in_trips do |t|
+        t.string :stops_title,  null: false, default: ""
+        t.references :destination, foreign_key: true
+        t.references :trip, foreign_key: true
       end
 
       add_index :trips, :title,  unique: true
