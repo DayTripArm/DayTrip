@@ -3,7 +3,7 @@ class Trip < ApplicationRecord
   has_many :destinations, through: :destinations_in_trips, :dependent => :destroy
   has_many :saved_trips
   has_many :logins, through: :saved_trips
-  has_many :reviews
+  has_many :trip_reviews
 
   accepts_nested_attributes_for :destinations_in_trips, :allow_destroy => true
 

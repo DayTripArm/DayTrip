@@ -1,10 +1,11 @@
+include ActionView::Helpers::NumberHelper
 module TripsHelper
   def self.trip_reviews_count(trip)
-    trip.reviews.count
+    trip.trip_reviews.count
   end
 
   def self.trip_reviews_rate(trip)
-    trip.reviews.average(:rate) || "0.0"
+    number_with_precision(trip.trip_reviews.average(:rate), :precision => 1) || "0.0"
   end
 
   def self.is_favourite(trip, login_id)
