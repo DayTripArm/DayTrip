@@ -29,7 +29,7 @@ class TripsController < ApplicationController
                    .where(id: params[:id]).first
         render json: {
             trip: trip,
-            destinations: trip.destinations,
+            destinations: TripsHelper::trip_destinations(trip),
             reviews: trip.reviews,
             is_saved: TripsHelper::is_favourite(trip, params[:login_id]),
             review_stats: {
