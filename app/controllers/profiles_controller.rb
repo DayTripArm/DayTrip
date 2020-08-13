@@ -5,6 +5,30 @@ class ProfilesController < ApplicationController
       profile = Login.exclude_fields.joins(:profile).where(id: params[:id]).first
     elsif params[:profile] == 'payments'
       #TODO Albert: Add user payments info part
+    elsif params[:profile] == "user_profile"
+      profile = {}
+      joins = [:profile]
+      select = 'logins.id, phone, profiles.name as user_name, email, about, location, languages, user_type, logins.created_at'
+
+      if params[:user_type] == "2"
+        joins.push(:driver_info, :photos)
+        select += ", car_specs, car_seats, car_mark, car_model"
+      end
+      user_info = Login.select(select).joins(joins).where({id: params[:id]}).first
+
+      if params[:user_type] == "2"
+        profile = user_info.as_json
+        car_photos = user_info.photos.where(file_type: 2)
+        profile[:car_full_name] = CarHelper::format_car_model(user_info[:car_mark].to_i, user_info[:car_model].to_i)
+        car_photos.each do |photo|
+          photo.full_path = PhotosHelper::get_photo_full_path(photo.name,  Photo::FILE_TYPES.key(photo.file_type), user_info[:id])
+        end
+        profile[:car_photos] = car_photos
+        profile[:reviews] = user_info.reviews
+      else
+        profile = user_info
+      end
+
     else
       profile = nil
     end
