@@ -18,6 +18,7 @@ class DriverInfosController < ApplicationController
             file_save = PhotosHelper::upload_and_save_photos(login, type_int, type, params[type]) unless params[type].blank?
         end
         login.update_attribute(:is_prereg, false) if params[:prereg_finish]
+        profile.update_attribute(:is_suspended, true) if profile.has_attribute?(:is_suspended)
 
         render json: {message: "Driver information has been saved."}, status: :ok
       else
@@ -65,22 +66,26 @@ class DriverInfosController < ApplicationController
     begin
       errors = []
       # TODO add update car photos
-      #file_save = PhotosHelper::upload_and_save_photos(login, type_int, "car_photos", params[:car_photos]) unless params[:car_photos].blank?
       Photo::FILE_TYPES.each do |type, type_int|
         next if params[type].blank?
-        file_save = PhotosHelper::upload_and_save_photos(Login.where({id: params[:login_id]}), type_int, type, params[type])
+        file_save = PhotosHelper::upload_and_save_photos(Login.where({id: params[:login_id]}), type_int, type, params[type]) unless params[type].blank?
       end
 
       unless params[:car_info].blank?
         driver_info = DriverInfo.find_by({login_id: params[:login_id]})
         driver_info.update_attributes(car_info_params)
         if driver_info.save
+          if [:car_type, :car_mark, :car_model, :car_color].any? {|k| params[:car_info].key?(k)}
+            profile = Profile.user_basic_info.find_by({login_id: params[:login_id]})
+            profile.update({is_suspended: true})
+            UserNotifierMailer.notify_admins(profile, params[:car_info]).deliver_now
+          end
           render json: {message: "Driver information has been updated."}, status: :ok
         else
           render json: {message: "Driver information failed to be updated."}, status: :ok
         end
       end
-    rescue StandardError, ActiveRecordError => e
+    rescue StandardError => e
       errors << e.message unless e.message.blank?
       render json: errors, status: :internal_server_error
     end
