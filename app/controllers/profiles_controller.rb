@@ -24,7 +24,9 @@ class ProfilesController < ApplicationController
           photo.full_path = PhotosHelper::get_photo_full_path(photo.name,  Photo::FILE_TYPES.key(photo.file_type), user_info[:id])
         end
         profile[:car_photos] = car_photos
-        profile[:reviews] = user_info.reviews
+        profile[:reviews_rate] = user_info.driver_reviews.average(:rate) || "0.0"
+        profile[:reviews_count] = user_info.driver_reviews.count()
+        profile[:reviews] = user_info.driver_reviews
       else
         profile = user_info
       end

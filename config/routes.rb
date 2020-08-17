@@ -38,5 +38,7 @@ Rails.application.routes.draw do
      # Saved trips APIs
      post "/save_trip", to: "trips#save_unsave_trip"
      get "/saved_trips", to: "trips#get_saved_trips"
+
+     post "/driver_reviews", to: "driver_reviews#create"
    end
 end

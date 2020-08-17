@@ -5,6 +5,7 @@ class Login < ApplicationRecord
   has_many :saved_trips
   has_many :trips, through: :saved_trips
   has_many :trip_reviews
+  has_many :driver_reviews, :foreign_key => "driver_id"
   accepts_nested_attributes_for :profile
 
   has_secure_password validations: false

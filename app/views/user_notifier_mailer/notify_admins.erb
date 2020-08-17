@@ -7,7 +7,7 @@
   <h4>The user <%= @user.name %> with email '<%= @user.email %>' has changed the following car details</h4>
 
   <ul>
-    <% @car_details.each do |index, detail| %>
+    <% @car_details.each || [] do |index, detail| %>
       <li><b><%= index.split('_').collect(&:capitalize).join(" ") %>:</b>   <%= detail %></li>
     <% end %>
   </ul>
