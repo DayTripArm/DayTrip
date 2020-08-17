@@ -14,6 +14,7 @@ class AddTrips < ActiveRecord::Migration[6.0]
       end
       create_table :destinations_in_trips do |t|
         t.string :stops_title,  null: false, default: ""
+        t.integer :position,  null: false
         t.references :destination, foreign_key: true
         t.references :trip, foreign_key: true
       end
