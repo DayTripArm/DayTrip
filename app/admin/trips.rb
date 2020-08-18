@@ -1,5 +1,5 @@
 ActiveAdmin.register Trip do
-  permit_params :title, :trip_duration, :start_location, :agenda, :published, destinations_in_trips_attributes: [:id, :stops_title, :trip_id, :destination_id, :_destroy], map_image: [],  images: []
+  permit_params :title, :trip_duration, :start_location, :agenda, :published, destinations_in_trips_attributes: [:id, :stops_title, :position, :trip_id, :destination_id, :_destroy], map_image: [],  images: []
 
   scope "All", :all
   scope "Top Choices", :top_choices
@@ -32,8 +32,11 @@ ActiveAdmin.register Trip do
       f.input :published
     end
     f.inputs 'Choose Trip Destinations' do
+      f.semantic_errors *f.object.errors.keys
       f.has_many :destinations_in_trips,
                  new_record: 'Add Destination',
+                 sortable: :position,
+                 sortable_start: 1,
                  allow_destroy: true do |b|
         b.input :stops_title
         b.input :destination_id, as: :select, :collection => Destination.all.collect {|destination| [destination.title, destination.id]}, input_html: { style: "width: 250px; height: 30px"}
