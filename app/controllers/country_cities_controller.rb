@@ -1,7 +1,7 @@
 class CountryCitiesController < ApplicationController
   def index
-    cc_all = CountryCity.all
-    render json: { cities: cc_all }, status: :ok
+    search_cities = CountryCity.where("city ilike  :search", search: "%#{params[:city]}%").order(city: :desc)
+    render json: { cities: search_cities }, status: :ok
   end
 
 end
