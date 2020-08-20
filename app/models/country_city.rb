@@ -1,0 +1,2 @@
+class CountryCity < ApplicationRecord
+end

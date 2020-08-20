@@ -15,6 +15,9 @@ Rails.application.routes.draw do
       get "/car_brands", to: "car_brands#index"
       get "/car_brands/:id/models", to: "car_brands#get_car_models"
 
+      #Fetch Country and Cities via API call
+      get "/country_cities", to: "country_cities#index"
+
       # Driver Infos API calls routes
       post "/driver_infos", to: "driver_infos#create"
       get "/driver_infos/:id", to: "driver_infos#edit"
