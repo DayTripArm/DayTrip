@@ -4,12 +4,16 @@
   </head>
 
   <body>
-  <h4>The user <%= @user.name %> with email '<%= @user.email %>' has changed the following car details</h4>
+  <% unless @car_details.blank? %>
+    <h4>The user <%= @user.name %> with email '<%= @user.email %>' has changed the following car details</h4>
 
-  <ul>
-    <% @car_details.each || [] do |index, detail| %>
-      <li><b><%= index.split('_').collect(&:capitalize).join(" ") %>:</b>   <%= detail %></li>
-    <% end %>
-  </ul>
+    <ul>
+      <% (@car_details || []).each do |index, detail| %>
+        <li><b><%= index.split('_').collect(&:capitalize).join(" ") %>:</b>   <%= detail %></li>
+      <% end %>
+    </ul>
+  <% else %>
+    <h4>The user <%= @user.name %> with email '<%= @user.email %>' successfuly completed registration.</h4>
+  <% end %>
   </body>
 </html>
