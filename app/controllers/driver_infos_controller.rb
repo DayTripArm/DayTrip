@@ -67,7 +67,7 @@ class DriverInfosController < ApplicationController
       # TODO add update car photos
       Photo::FILE_TYPES.each do |type, type_int|
         next if params[type].blank?
-        file_save = PhotosHelper::upload_and_save_photos(Login.where({id: params[:login_id]}), type_int, type, params[type]) unless params[type].blank?
+        file_save = PhotosHelper::upload_and_save_photos(Login.where({id: params[:login_id]}).first, type_int, type, params[type]) unless params[type].blank?
       end
 
       unless params[:car_info].blank?
