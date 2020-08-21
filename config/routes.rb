@@ -35,7 +35,8 @@ Rails.application.routes.draw do
 
      # Get trips list
      get "/trips", to: "trips#index"
-     get "/trips/:id", to: "trips#trip_detail"
+     get "/trips/:id", to: "trips#trip_individual"
+     get "/trips/:id", to: "trips#trip_details"
      post "/trips/add_review", to: "trips#add_review"
 
      # Saved trips APIs
@@ -43,5 +44,9 @@ Rails.application.routes.draw do
      get "/saved_trips", to: "trips#get_saved_trips"
 
      post "/driver_reviews", to: "driver_reviews#create"
+
+     # Calendar settings
+     get "/calendar_settings/:id", to: "calendar_settings#edit"
+     post "/calendar_settings/:id", to: "calendar_settings#create"
    end
 end

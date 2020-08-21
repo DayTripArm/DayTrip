@@ -22,7 +22,7 @@ class TripsController < ApplicationController
     render json: trips_arr, status: :ok
   end
 
-  def trip_detail
+  def trip_individual
     if params[:id]
       begin
         trip = Trip.active_trips.joins(:destinations_in_trips, :destinations)
@@ -65,6 +65,8 @@ class TripsController < ApplicationController
     end
   end
 
+  # Retrive all trips marked as favourite/saved
+  # GET /saved_trips
   def get_saved_trips
     begin
       saved_trips = Trip.joins(:saved_trips).where("saved_trips.login_id = ?", params[:login_id])
@@ -74,6 +76,8 @@ class TripsController < ApplicationController
     end
   end
 
+  # Create review for trip
+  # GET /add_review
   def add_review
     begin
        trip = Trip.find_by(id: params[:trip_id])
