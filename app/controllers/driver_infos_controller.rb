@@ -71,6 +71,7 @@ class DriverInfosController < ApplicationController
       end
 
       unless params[:car_info].blank?
+        params[:car_info] = JSON.parse(params[:car_info])
         driver_info = DriverInfo.find_by({login_id: params[:login_id]})
         driver_info.update_attributes(car_info_params)
         if driver_info.save
@@ -118,6 +119,6 @@ class DriverInfosController < ApplicationController
   def set_onhold_and_notify_admins notif_type
     profile = Profile.user_basic_info.find_by({login_id: params[:login_id]})
     profile.update_attribute(:is_suspended, true) if profile.has_attribute?(:is_suspended)
-    UserNotifierMailer.notify_admins(profile, notif_type[:type] == :car_update ? params[:car_info]: []).deliver_now
+    UserNotifierMailer.notify_admins(profile, notif_type[:type] == :car_update ? params[:car_info]: []).deliver_later(wait: 1.min)
   end
 end
