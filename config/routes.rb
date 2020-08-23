@@ -47,6 +47,6 @@ Rails.application.routes.draw do
 
      # Calendar settings
      get "/calendar_settings/:id", to: "calendar_settings#edit"
-     post "/calendar_settings/:id", to: "calendar_settings#create"
+     post "/calendar_settings/:id", to: "calendar_settings#create_update"
    end
 end
