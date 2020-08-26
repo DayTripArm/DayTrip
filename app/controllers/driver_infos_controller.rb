@@ -18,7 +18,8 @@ class DriverInfosController < ApplicationController
             file_save = PhotosHelper::upload_and_save_photos(login, type_int, type, params[type]) unless params[type].blank?
         end
         login.update_attribute(:is_prereg, false) if params[:prereg_finish]
-        set_onhold_and_notify_admins({:type => :prereg})
+        profile.update_attribute(:is_suspended, true) if profile.has_attribute?(:is_suspended)
+        set_onhold_and_notify_admins()
         render json: {message: "Driver information has been saved."}, status: :ok
       else
         render json: {message: "Please fill in required fields"}, status: :ok
@@ -75,8 +76,13 @@ class DriverInfosController < ApplicationController
         driver_info = DriverInfo.find_by({login_id: params[:login_id]})
         driver_info.update_attributes(car_info_params)
         if driver_info.save
-          if [:car_type, :car_mark, :car_model, :car_color].any? {|k| params[:car_info].key?(k)}
-            set_onhold_and_notify_admins({:type => :car_update})
+          if ![:car_photos,:gov_photos,:license_photos].any? {|k| params.key?(k)}
+            profile = Profile.find_by({login_id: params[:login_id]})
+            profile.update_attribute(:is_suspended, true) if profile.has_attribute?(:is_suspended)
+          end
+          if [:car_photos,:gov_photos,:license_photos].any? {|k| params.key?(k)} ||
+             [:car_type, :car_mark, :car_model, :car_color].any? {|k| car_info_params.key?(k)}
+            set_onhold_and_notify_admins()
           end
           render json: {message: "Driver information has been updated."}, status: :ok
         else
@@ -116,9 +122,7 @@ class DriverInfosController < ApplicationController
   end
 
   private
-  def set_onhold_and_notify_admins notif_type
-    profile = Profile.user_basic_info.find_by({login_id: params[:login_id]})
-    profile.update_attribute(:is_suspended, true) if profile.has_attribute?(:is_suspended)
-    UserNotifierMailer.notify_admins(profile, notif_type[:type] == :car_update ? params[:car_info]: []).deliver_later(wait: 1.min)
+  def set_onhold_and_notify_admins
+    UserNotifierMailer.notify_admins(params[:id], car_info_params).deliver_later(wait: 30.seconds)
   end
 end
