@@ -19,7 +19,7 @@ class DriverInfosController < ApplicationController
         end
         login.update_attribute(:is_prereg, false) if params[:prereg_finish]
         profile.update_attribute(:is_suspended, true) if profile.has_attribute?(:is_suspended)
-        set_onhold_and_notify_admins()
+        notify_admins("prereg")
         render json: {message: "Driver information has been saved."}, status: :ok
       else
         render json: {message: "Please fill in required fields"}, status: :ok
@@ -65,6 +65,7 @@ class DriverInfosController < ApplicationController
   def update
     begin
       errors = []
+      file_save = nil
       # TODO add update car photos
       Photo::FILE_TYPES.each do |type, type_int|
         next if params[type].blank?
@@ -76,18 +77,21 @@ class DriverInfosController < ApplicationController
         driver_info = DriverInfo.find_by({login_id: params[:login_id]})
         driver_info.update_attributes(car_info_params)
         if driver_info.save
-          if ![:car_photos,:gov_photos,:license_photos].any? {|k| params.key?(k)}
-            profile = Profile.find_by({login_id: params[:login_id]})
-            profile.update_attribute(:is_suspended, true) if profile.has_attribute?(:is_suspended)
-          end
-          if [:car_photos,:gov_photos,:license_photos].any? {|k| params.key?(k)} ||
-             [:car_type, :car_mark, :car_model, :car_color].any? {|k| car_info_params.key?(k)}
-            set_onhold_and_notify_admins()
+          profile = Profile.find_by({login_id: params[:login_id]})
+          profile.update_attribute(:is_suspended, true) if profile.has_attribute?(:is_suspended)
+          if [:car_type, :car_mark, :car_model, :car_color].any? {|k| car_info_params.key?(k)}
+            notify_admins("car_details")
           end
           render json: {message: "Driver information has been updated."}, status: :ok
         else
           render json: {message: "Driver information failed to be updated."}, status: :ok
         end
+      end
+      if file_save
+        if [:car_photos,:gov_photos,:license_photos].any? {|k| params.key?(k)}
+          notify_admins("car_details")
+        end
+        render json: {message: "Car photo has been added."}, status: :ok
       end
     rescue StandardError => e
       errors << e.message unless e.message.blank?
@@ -101,6 +105,7 @@ class DriverInfosController < ApplicationController
       errors = []
       unless params[:id].blank?
         PhotosHelper::remove_photos(Login.where({id: params[:id]}).first, params[:photo])
+        notify_admins("car_details")
         render json: {message: "Photo has been deleted."}, status: :ok
       end
     rescue StandardError, ActiveRecordError => e
@@ -122,7 +127,12 @@ class DriverInfosController < ApplicationController
   end
 
   private
-  def set_onhold_and_notify_admins
-    UserNotifierMailer.notify_admins(params[:id], car_info_params).deliver_later(wait: 30.seconds)
+  def notify_admins type
+    case type
+      when "car_details"
+        UserNotifierMailer.notify_admins_car_details(params[:id]).deliver_later(wait: 30.seconds)
+      when "prereg"
+        UserNotifierMailer.notify_admins_prereg(params[:login_id]).deliver_later(wait: 30.seconds)
+    end
   end
 end
