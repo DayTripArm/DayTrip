@@ -18,7 +18,7 @@ class DriverInfosController < ApplicationController
             file_save = PhotosHelper::upload_and_save_photos(login, type_int, type, params[type]) unless params[type].blank?
         end
         login.update_attribute(:is_prereg, false) if params[:prereg_finish]
-        profile.update_attribute(:is_suspended, true) if profile.has_attribute?(:is_suspended)
+        set_user_status(profile)
         notify_admins("prereg")
         render json: {message: "Driver information has been saved."}, status: :ok
       else
@@ -77,8 +77,6 @@ class DriverInfosController < ApplicationController
         driver_info = DriverInfo.find_by({login_id: params[:login_id]})
         driver_info.update_attributes(car_info_params)
         if driver_info.save
-          profile = Profile.find_by({login_id: params[:login_id]})
-          profile.update_attribute(:is_suspended, true) if profile.has_attribute?(:is_suspended)
           if [:car_type, :car_mark, :car_model, :car_color].any? {|k| car_info_params.key?(k)}
             notify_admins("car_details")
           end
@@ -134,5 +132,10 @@ class DriverInfosController < ApplicationController
       when "prereg"
         UserNotifierMailer.notify_admins_prereg(params[:login_id]).deliver_later(wait: 30.seconds)
     end
+  end
+
+  def set_user_status profile
+    profile = Profile.find_by({login_id: params[:login_id]}) if profile.nil?
+    profile.update({status: Profile::STATUS_SUSPENDED})
   end
 end
