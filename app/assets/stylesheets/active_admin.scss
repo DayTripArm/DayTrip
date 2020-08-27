@@ -35,3 +35,16 @@ select[multiple] > option {
   padding: 5px;
   border-radius: 3px;
 }
+.status_tag {
+  padding: 7px;
+
+  &.orange {
+    background-color: #FFBB00;
+  }
+  &.green{
+    background-color: #228B22;
+  }
+  &.red{
+    background-color: #FF0000;
+  }
+}
