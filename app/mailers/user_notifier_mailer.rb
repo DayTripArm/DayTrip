@@ -1,5 +1,5 @@
 class UserNotifierMailer < ApplicationMailer
-  default from: 'daytriparmenia@gmail.com'
+  default from: ENV['DTArmenia_EMAIL']
 
   def notify_admins_car_details(login_id)
     @user = Profile.user_basic_info(login_id)
