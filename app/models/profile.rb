@@ -2,10 +2,12 @@ class Profile < ApplicationRecord
   belongs_to :login, optional: true
   validates_presence_of  :name, message: "cannot be blank"
   scope :user_basic_info, -> (login_id) { select("logins.id, logins.email, profiles.name").joins(:login).find_by(login_id: login_id) }
-  scope :pending, ->  { where(:status => STATUS_PREREG) }
-  scope :approved, ->  { where(:status => STATUS_ACTIVE) }
-  scope :suspended, ->  { where(:status => STATUS_SUSPENDED) }
-  scope :declined, ->  { where(:status => STATUS_DEACTIVATED) }
+
+  scope :drivers_all, -> { includes(:login).where(logins: {user_type: 2}) }
+  scope :drivers_pending, ->   { includes(:login).where(logins: {user_type: 2}, :status => STATUS_PREREG) }
+  scope :drivers_approved, ->  { includes(:login).where(logins: {user_type: 2}, :status => STATUS_ACTIVE) }
+  scope :drivers_suspended, ->  { includes(:login).where(logins: {user_type: 2}, :status => STATUS_SUSPENDED) }
+  scope :drivers_declined, ->  { includes(:login).where(logins: {user_type: 2}, :status => STATUS_DEACTIVATED) }
 
   STATUS_PREREG = 0
   STATUS_SUSPENDED = 1
