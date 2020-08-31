@@ -5,8 +5,9 @@ class Photo < ApplicationRecord
   CAR = 2
   GOV = 3
   LICENSE = 4
+  REG_CARD = 5
 
-  FILE_TYPES = {"profile_photos" => 1, "car_photos" => 2, "gov_photos" => 3, "license_photos" => 4}
+  FILE_TYPES = {"profile_photos" => 1, "car_photos" => 2, "gov_photos" => 3, "license_photos" => 4, "reg_card_photos" => 5}
   scope :driver_photos, -> (login_id) { where({login_id: login_id}) }
   attribute :full_path
 end
