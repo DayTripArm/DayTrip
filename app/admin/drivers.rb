@@ -72,6 +72,16 @@ ActiveAdmin.register Profile, as: "Drivers" do
           end
         end
       end
+      row 'Registration Card' do
+        ul do
+          driving_license = Photo.where({login_id: params[:id], file_type: Photo::REG_CARD})
+          driving_license.each do |dl|
+            li do
+              image_tag(PhotosHelper::get_photo_full_path(dl.name, "reg_card_photos", params[:id]))
+            end
+          end
+        end
+      end
       row 'Car Photos' do
         ul do
           car_photos = Photo.where({login_id: params[:id], file_type: Photo::CAR})
