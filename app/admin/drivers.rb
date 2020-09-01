@@ -1,6 +1,6 @@
 ActiveAdmin.register Profile, as: "Drivers" do
 
-  scope "All", :drivers_all
+  scope "All", :drivers_all, default: true
   scope "Approved", :drivers_approved
   scope "Suspended", :drivers_suspended
   scope "Pending Approval", :drivers_pending
