@@ -46,7 +46,7 @@ class DriverInfosController < ApplicationController
         }
 
         Photo::FILE_TYPES.each do |type, type_int|
-          next if type_int == 1
+          next if type_int == 1 || type_int == 3
           driver_photos = Photo.where({login_id: params[:id], file_type: type_int})
           driver_photos.each do |photo|
             photo.full_path = PhotosHelper::get_photo_full_path(photo.name, type, params[:id])
