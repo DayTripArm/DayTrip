@@ -131,6 +131,7 @@ class DriverInfosController < ApplicationController
         UserNotifierMailer.notify_admins_car_details(params[:id]).deliver_later(wait: 30.seconds)
       when "prereg"
         UserNotifierMailer.notify_admins_prereg(params[:login_id]).deliver_later(wait: 30.seconds)
+        UserNotifierMailer.notify_drivers_prereg(params[:login_id]).deliver_later(wait: 30.seconds)
     end
   end
 
