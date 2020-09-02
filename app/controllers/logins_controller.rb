@@ -8,6 +8,9 @@ class LoginsController < ApplicationController
     new_user = Login.new(login_params)
     new_user.build_profile(name: params[:name], phone: params[:phone])
     if new_user.save
+      if new_user.user_type == 1
+        UserNotifierMailer.notify_travelers_prereg(new_user.id).deliver_later(wait: 30.seconds)
+      end
       render json: payload(new_user), status: :ok
     else
       attrs = new_user.errors.messages.keys

@@ -18,7 +18,6 @@ class DriverInfosController < ApplicationController
             file_save = PhotosHelper::upload_and_save_photos(login, type_int, type, params[type]) unless params[type].blank?
         end
         login.update_attribute(:is_prereg, false) if params[:prereg_finish]
-        set_user_status(profile)
         notify_admins("prereg")
         render json: {message: "Driver information has been saved."}, status: :ok
       else
@@ -86,7 +85,7 @@ class DriverInfosController < ApplicationController
         end
       end
       if file_save
-        if [:car_photos,:gov_photos,:license_photos].any? {|k| params.key?(k)}
+        if [:car_photos,:gov_photos,:license_photos,:reg_card_photos].any? {|k| params.key?(k)}
           notify_admins("car_details")
         end
         render json: {message: "Car photo has been added."}, status: :ok
@@ -101,8 +100,8 @@ class DriverInfosController < ApplicationController
   def delete_photo
     begin
       errors = []
-      unless params[:id].blank?
-        PhotosHelper::remove_photos(Login.where({id: params[:id]}).first, params[:photo])
+      unless params[:photo].blank?
+        PhotosHelper::remove_photos(params[:photo])
         notify_admins("car_details")
         render json: {message: "Photo has been deleted."}, status: :ok
       end
