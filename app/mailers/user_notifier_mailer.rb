@@ -27,11 +27,11 @@ class UserNotifierMailer < ApplicationMailer
 
   def notify_profile_approved(login_id)
     @user = Profile.user_basic_info(login_id)
-    mail(to: @user.email, subject: 'DayTrip Armenia: Your profile has been approved')
+    mail(to: @user.email, subject: 'DayTrip Armenia: Account Approval Notice')
   end
 
   def notify_profile_declined(login_id)
     @user = Profile.user_basic_info(login_id)
-    mail(to: @user.email, subject: 'DayTrip Armenia: Your profile has been approved')
+    mail(to: @user.email, subject: 'DayTrip Armenia: Account Rejection Notice')
   end
 end

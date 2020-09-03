@@ -4,12 +4,27 @@
   </head>
 
   <body>
-    <p>Dear <%= @user.name %>,</p>
-    <p>
-      Your registration request has been declined.
-    </p>
-    <p>
-      Please contact the Day Trip for more information.
-    </p>
+  <p>Dear <%= @user.name %>,</p>
+  <p>Thanks for your interest in becoming a DayTrip member!</p>
+  <p>Unfortunately, your account did not pass the verification.</p>
+  <p>Please make sure all required information was provided properly according to DayTrip registration policy. Check the link below for detailed information on our requirements and try again:</p>
+  <p>{link}</p>
+  <p>Consider the following as probable reasons for rejection:</p>
+  <p>
+  <ol>
+    <li>Provided documents are not valid </li>
+    <li>Provided pictures are not clear and visible</li>
+    <li>Car condition is not satisfactory</li>
+    <li>Your driving skills are not satisfactory based on driving records checkup</li>
+  </ol>
+  </p>
+
+  <p>You can contact us for more information about your account rejection.</p>
+  <p>We will be happy to help you!</p>
+  <br>
+  <p>
+  <div>Our best,</div>
+  <div>DayTrip Armenia</div>
+  </p>
   </body>
 </html>
