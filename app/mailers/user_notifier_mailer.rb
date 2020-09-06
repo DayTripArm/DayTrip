@@ -39,4 +39,14 @@ class UserNotifierMailer < ApplicationMailer
     @user = Profile.user_basic_info(login_id)
     mail(to: @user.email, subject: 'DayTrip Armenia: Account Temporarily Suspended')
   end
+
+  def notify_drivers_suspend_approval(login_id)
+    @user = Profile.user_basic_info(login_id)
+    mail(to: @user.email, subject: 'DayTrip Armenia: Account Changes Approved')
+  end
+
+  def notify_drivers_suspend_rejection(login_id)
+    @user = Profile.user_basic_info(login_id)
+    mail(to: @user.email, subject: 'DayTrip Armenia: Account Changes Rejected')
+  end
 end
