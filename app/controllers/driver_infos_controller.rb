@@ -128,6 +128,7 @@ class DriverInfosController < ApplicationController
     case type
       when "car_details"
         UserNotifierMailer.notify_admins_car_details(params[:id]).deliver_later(wait: 30.seconds)
+        UserNotifierMailer.notify_drivers_suspend(params[:login_id]).deliver_later(wait: 30.seconds)
       when "prereg"
         UserNotifierMailer.notify_admins_prereg(params[:login_id]).deliver_later(wait: 30.seconds)
         UserNotifierMailer.notify_drivers_prereg(params[:login_id]).deliver_later(wait: 30.seconds)

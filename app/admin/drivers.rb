@@ -34,14 +34,24 @@ ActiveAdmin.register Profile, as: "Drivers" do
   end
 
   member_action :approve, method: :get do
+    current_status = resource.status
     resource.approve!
-    UserNotifierMailer.notify_profile_approved(params[:id]).deliver_later(wait: 30.seconds)
+    if current_status == Profile::STATUS_SUSPENDED
+      UserNotifierMailer.notify_drivers_suspend_approval(params[:id]).deliver_later(wait: 30.seconds)
+    else
+      UserNotifierMailer.notify_profile_approved(params[:id]).deliver_later(wait: 30.seconds)
+    end
     redirect_to admin_drivers_path, notice: "Driver profile has been approved!"
   end
 
   member_action :decline, method: :get do
+    current_status = resource.status
     resource.decline!
-    UserNotifierMailer.notify_profile_declined(params[:id]).deliver_later(wait: 30.seconds)
+    if current_status == Profile::STATUS_SUSPENDED
+      UserNotifierMailer.notify_drivers_suspend_rejection(params[:id]).deliver_later(wait: 30.seconds)
+    else
+      UserNotifierMailer.notify_profile_declined(params[:id]).deliver_later(wait: 30.seconds)
+    end
     redirect_to admin_drivers_path, notice: "Driver profile has been declined!"
   end
 
