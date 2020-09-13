@@ -12,8 +12,19 @@ class CalendarSettingsController < ApplicationController
 
   def create_update
       begin
-        cal_setting = find_settings(params[:calendar_setting][:driver_id])
+        cal_setting = find_settings(cal_settings_params[:driver_id])
         unless cal_setting.blank?
+          unless params[:day].blank?
+            exclude_days = cal_setting.unavailable_days.to_a
+            if exclude_days.include?(params[:day])
+              exclude_days.delete(params[:day])
+            else
+              exclude_days << params[:day]
+            end
+            params[:unavailable_days] = exclude_days
+            cal_settings_params[:unavailable_days] = exclude_days
+            params.delete(:day)
+          end
           cal_setting.update_attributes(cal_settings_params)
           cal_setting.save
         else
@@ -21,32 +32,15 @@ class CalendarSettingsController < ApplicationController
           cal_setting.assign_attributes(cal_settings_params)
           cal_setting.save
         end
-        render json: { message: "Setting saved" }, status: :ok
+        render json: { message: "Calendar settings has been changed" }, status: :ok
       rescue StandardError => e
         render json: e.message, status: :ok
       end
   end
 
-  def set_unavailable_days
-    begin
-      calendar = find_settings(params[:calendar_setting][:driver_id])
-      exclude_days = calendar.unavailable_days.to_h
-      if params[:calendar_setting][:exclude]
-        exclude_days = {params[:calendar_setting][:day] => true}
-      else
-        exclude_days.delete(params[:calendar_setting][:day])
-      end
-      calendar.unavailable_days = calendar.unavailable_days.to_h.merge(exclude_days)
-      calendar.save
-      render json: { message: "Current day's state has been updated in your calendar." }, status: :ok
-    rescue StandardError => e
-      render json: e.message, status: :ok
-    end
-  end
-
   private
   def cal_settings_params
-    params.require(:calendar_setting).permit(:advance_notice, :availability_window, :driver_id)
+    params.except(:calendar_setting,:id).permit(:unavailable_days, :advance_notice, :availability_window, :day, :driver_id)
   end
 
   def find_settings driver_id
