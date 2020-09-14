@@ -4,6 +4,15 @@
   </head>
 
   <body>
-    <h4>The user <%= @user.name %> with email '<%= @user.email %>' has changed car details</h4>
+  <p>Hey There!</p>
+
+  <p><%= @user.name %> made some changes to the account. Follow the link below for review.</p>
+  <p><%= admin_driver_url(@user.id) %></p>
+  <br>
+
+  <p>
+  <div>Our best,</div>
+  <div>DayTrip Armenia.</div>
+  </p>
   </body>
 </html>
