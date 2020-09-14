@@ -69,7 +69,7 @@ class TripsController < ApplicationController
   # GET /saved_trips
   def get_saved_trips
     begin
-      saved_trips = Trip.joins(:saved_trips).where("saved_trips.login_id = ?", params[:login_id])
+      saved_trips = Trip.active_trips.joins(:saved_trips).where("saved_trips.login_id = ?", params[:login_id])
       render json: saved_trips, status: :ok
     rescue StandardError, ActiveRecordError => e
       render json: e.message, status: :ok

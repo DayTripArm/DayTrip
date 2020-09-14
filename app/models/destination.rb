@@ -9,4 +9,6 @@ class Destination < ApplicationRecord
   validates_uniqueness_of :title
   validates :description, presence: true
   validates :image, presence: true
+
+  scope :published, ->  { where(:published => true) }
 end

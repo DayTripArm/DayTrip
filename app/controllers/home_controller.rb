@@ -1,11 +1,11 @@
 class HomeController < ApplicationController
   def heroes
-    heroes = Hero.first
+    heroes = Hero.where(published: true).first
     render json: heroes, status: :ok
   end
 
   def hit_the_road
-    hit_the_road = HitTheRoad.first
+    hit_the_road = HitTheRoad.where(published: true).first
     render json: hit_the_road, status: :ok
   end
 end
