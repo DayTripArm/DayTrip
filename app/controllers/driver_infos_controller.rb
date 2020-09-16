@@ -111,24 +111,6 @@ class DriverInfosController < ApplicationController
     end
   end
 
-  def search_drivers
-    begin
-      drivers = DriverInfo.select("login.name, photos.*, driver_reviews.rate")
-                    .join(:login, :photos, :driver_reviews)
-                    .where({file_type: [1,2]})
-      unless params[:travelers_count].blank?
-        drivers.where("car_seats >= ?", params[:travelers_count])
-      end
-      unless params[:trip_day].blank?
-        drivers.joins(:calendar_settings).where.not("unavailable_days", params[:trip_day])
-      end
-      render json: {drivers: drivers}, status: :ok
-    rescue StandardError, ActiveRecordError => e
-      errors << e.message unless e.message.blank?
-      render json: errors, status: :internal_server_error
-    end
-  end
-
   # Permit request params
   def driver_info_params
     params.require(:driver_info).permit(:car_type, :car_mark, :car_model, :car_year, :car_color, :car_seats, :car_specs, :driver_destinations, :tariff1, :tariff2)
