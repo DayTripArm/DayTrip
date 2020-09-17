@@ -18,12 +18,11 @@ class HomeController < ApplicationController
                     .where("logins.user_type = 2").distinct
 
       unless params[:travelers].blank?
-        drivers.where("car_seats >= ?", params[:travelers])
+        drivers = drivers.where("car_seats >= ?", params[:travelers].to_i)
       end
       unless params[:date].blank?
-        drivers.joins(:calendar_settings).where.not("unavailable_days", params[:date])
+        drivers = drivers.joins(:calendar_setting).where.not("calendar_settings.unavailable_days ->> 'excluded_days' LIKE ?", "%#{params[:date]}%")
       end
-
       drivers.each_with_index do |driver, index|
         drivers_list[index] = driver.to_json
         drivers_photos = driver.photos.where(file_type: [1,2])

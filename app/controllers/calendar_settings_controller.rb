@@ -15,14 +15,15 @@ class CalendarSettingsController < ApplicationController
         cal_setting = find_settings(cal_settings_params[:driver_id])
         unless cal_setting.blank?
           unless params[:day].blank?
-            exclude_days = cal_setting.unavailable_days.to_a
-            if exclude_days.include?(params[:day])
-              exclude_days.delete(params[:day])
+            unavailable_days = cal_setting.unavailable_days.to_h
+            unavailable_days = {excluded_days: []} if unavailable_days.blank?
+            if unavailable_days["excluded_days"].include?(params[:day])
+              unavailable_days["excluded_days"].delete(params[:day])
             else
-              exclude_days << params[:day]
+              unavailable_days["excluded_days"] << params[:day]
             end
-            params[:unavailable_days] = exclude_days
-            cal_settings_params[:unavailable_days] = exclude_days
+            params[:unavailable_days] = unavailable_days
+            cal_settings_params[:unavailable_days] = unavailable_days
             params.delete(:day)
           end
           cal_setting.update_attributes(cal_settings_params)
@@ -40,7 +41,7 @@ class CalendarSettingsController < ApplicationController
 
   private
   def cal_settings_params
-    params.except(:calendar_setting,:id).permit(:unavailable_days, :advance_notice, :availability_window, :day, :driver_id)
+    params.except(:calendar_setting,:id).permit( :advance_notice, :availability_window, :day, :driver_id, unavailable_days: {})
   end
 
   def find_settings driver_id
