@@ -9,6 +9,7 @@ class TipCategory < ApplicationRecord
 # Tip categories. Each Tip type should be uniq.
   CAR_UPLOAD = 1
   DRIVER_PRICE = 2
+  HIT_THE_ROAD = 3
 
-  TIPS_TYPE = [['Car upload tip', CAR_UPLOAD], ['Driver price tip', DRIVER_PRICE]]
+  TIPS_TYPE = [['Car upload tip', CAR_UPLOAD], ['Driver price tip', DRIVER_PRICE], ['Hit the Road tip', HIT_THE_ROAD]]
 end

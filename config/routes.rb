@@ -32,6 +32,7 @@ Rails.application.routes.draw do
       # API to retrieve 'Heroes' and 'Hit the Road' section data(images and texts)
       get "/heroes", to: "home#heroes"
       get "/hit_the_road", to: "home#hit_the_road"
+      get "/search_drivers", to: "home#search_drivers"
 
      # Get trips list
      get "/trips", to: "trips#index"
