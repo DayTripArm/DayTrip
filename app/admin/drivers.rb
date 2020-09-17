@@ -29,6 +29,9 @@ ActiveAdmin.register Profile, as: "Drivers" do
   action_item :approve, only: :show do
     link_to 'Approve', approve_admin_driver_path(resource)
   end
+  action_item :suspend, only: :show do
+    link_to 'Suspend', suspend_admin_driver_path(resource)
+  end
   action_item :decline, only: :show do
     link_to 'Decline', decline_admin_driver_path(resource)
   end
@@ -42,6 +45,18 @@ ActiveAdmin.register Profile, as: "Drivers" do
       UserNotifierMailer.notify_profile_approved(params[:id]).deliver_later(wait: 30.seconds)
     end
     redirect_to admin_drivers_path, notice: "Driver profile has been approved!"
+  end
+
+  member_action :suspend, method: :get do
+    current_status = resource.status
+    if current_status == Profile::STATUS_SUSPENDED
+      message = "Driver profile is already suspended."
+    else
+      resource.suspend!
+      message =  "Driver profile has been suspended!"
+      UserNotifierMailer.notify_drivers_suspend(params[:id]).deliver_later(wait: 30.seconds)
+    end
+    redirect_to admin_drivers_path, notice: message
   end
 
   member_action :decline, method: :get do

@@ -46,4 +46,8 @@ class Profile < ApplicationRecord
   def decline!
     update(status: STATUS_DEACTIVATED)
   end
+
+  def suspend!
+    update(status: STATUS_SUSPENDED)
+  end
 end
