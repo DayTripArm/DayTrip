@@ -3,6 +3,9 @@ class CalendarSettingsController < ApplicationController
     if params[:id]
       begin
         cal_setting = find_settings(params[:id])
+        cal_setting[:advance_notice] = cal_setting[:advance_notice] || 0
+        cal_setting[:availability_window] = cal_setting[:availability_window] || 4
+        cal_setting[:unavailable_days] = cal_setting[:unavailable_days].nil? ? [] : cal_setting[:unavailable_days]["excluded_days"]
         render json: cal_setting || {}, status: :ok
       rescue StandardError => e
         render json: e.message, status: :ok
@@ -16,7 +19,7 @@ class CalendarSettingsController < ApplicationController
         unless cal_setting.blank?
           unless params[:day].blank?
             unavailable_days = cal_setting.unavailable_days.to_h
-            unavailable_days = {excluded_days: []} if unavailable_days.blank?
+            unavailable_days = {"excluded_days" => []} if unavailable_days.blank?
             if unavailable_days["excluded_days"].include?(params[:day])
               unavailable_days["excluded_days"].delete(params[:day])
             else
@@ -41,7 +44,7 @@ class CalendarSettingsController < ApplicationController
 
   private
   def cal_settings_params
-    params.except(:calendar_setting,:id).permit( :advance_notice, :availability_window, :day, :driver_id, unavailable_days: {})
+    params.except(:calendar_setting,:id).permit( :advance_notice, :availability_window, :driver_id, unavailable_days: {})
   end
 
   def find_settings driver_id

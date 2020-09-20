@@ -33,7 +33,7 @@ class HomeController < ApplicationController
         drivers_list[index][:drivers_photos] = drivers_photos
       end
       unless params[:trip_id].blank?
-        trip_details = Trip.select('iamges, title, trip_duration, start_location').where(id: params[:trip_id])
+        trip_details = Trip.select('images, title, trip_duration, start_location').where(id: params[:trip_id])
       end
 
       render json: {trip_details: trip_details, drivers: drivers_list}, status: :ok
