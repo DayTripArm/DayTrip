@@ -113,7 +113,7 @@ class DriverInfosController < ApplicationController
 
   # Permit request params
   def driver_info_params
-    params.require(:driver_info).permit(:car_type, :car_mark, :car_model, :car_year, :car_color, :car_seats, :car_specs, :driver_destinations, :tariff1, :tariff2)
+    params.require(:driver_info).permit(:car_type, :car_mark, :car_model, :car_year, :car_color, :car_seats, :car_specs, :driver_destinations, :tariff1, :tariff2, :hit_the_road_tariff)
   end
 
   def profile_info_params
@@ -121,7 +121,7 @@ class DriverInfosController < ApplicationController
   end
 
   def car_info_params
-    params.require(:car_info).permit(:car_type, :car_mark, :car_model, :car_year, :car_color, :car_seats, :car_specs, :driver_destinations, :tariff1, :tariff2)
+    params.require(:car_info).permit(:car_type, :car_mark, :car_model, :car_year, :car_color, :car_seats, :car_specs, :driver_destinations, :tariff1, :tariff2, :hit_the_road_tariff)
   end
 
   # Private methods
