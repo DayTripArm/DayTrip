@@ -4,6 +4,7 @@ class Trip < ApplicationRecord
   has_many :saved_trips
   has_many :logins, through: :saved_trips
   has_many :trip_reviews
+  has_many :booked_trips
 
   accepts_nested_attributes_for :destinations_in_trips, :allow_destroy => true
 
