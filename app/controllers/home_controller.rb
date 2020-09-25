@@ -15,7 +15,8 @@ class HomeController < ApplicationController
       drivers_list = []
       drivers = Login.joins(:profile, :driver_info, :photos)
                     .select("logins.id, profiles.name AS driver_name, profiles.languages, driver_infos.car_seats, driver_infos.car_specs,
-                            driver_infos.hit_the_road_tariff, driver_infos.car_mark, driver_infos.car_model")
+                            driver_infos.hit_the_road_tariff, driver_infos.tariff1, driver_infos.tariff1, driver_infos.tariff2,
+                            driver_infos.car_mark, driver_infos.car_model")
                     .where("logins.user_type = 2 AND driver_infos.hit_the_road_tariff is not null").distinct
 
       unless params[:travelers].blank?
@@ -24,6 +25,13 @@ class HomeController < ApplicationController
       unless params[:date].blank?
         drivers = drivers.joins(:calendar_setting).where.not("calendar_settings.unavailable_days ->> 'excluded_days' LIKE ?", "%#{params[:date]}%")
       end
+      unless params[:trip_id].blank?
+        trip_details = Trip.select('images, title, trip_duration, start_location').where(id: params[:trip_id])
+        drivers = drivers.order("tariff1 #{params[:sort] || 'ASC'}, tariff2 #{params[:sort] || 'ASC'}")
+      end
+      drivers = drivers.limit(params[:limit] || 10).offset(params[:offset] || 0)
+      drivers = drivers.order(hit_the_road_tariff: params[:sort] || 'ASC')
+
       drivers.each_with_index do |driver, index|
         drivers_list[index] = driver.to_json
         drivers_list[index] = JSON.parse(drivers_list[index])
@@ -36,9 +44,6 @@ class HomeController < ApplicationController
         end
         drivers_list[index]["car_specs"] = JSON.parse(drivers_list[index]["car_specs"])
         drivers_list[index][:car_full_name] = CarHelper::format_car_model(driver[:car_mark].to_i, driver[:car_model].to_i)
-      end
-      unless params[:trip_id].blank?
-        trip_details = Trip.select('images, title, trip_duration, start_location').where(id: params[:trip_id])
       end
 
       render json: {trip_details: trip_details, drivers_list: drivers_list}, status: :ok
