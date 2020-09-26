@@ -14,7 +14,7 @@ class HomeController < ApplicationController
     begin
       drivers_list = []
       drivers = Login.joins(:profile, :driver_info, :photos)
-                    .select("logins.id, profiles.name AS driver_name, profiles.languages, driver_infos.car_seats, driver_infos.car_specs,
+                    .select("logins.id, logins.user_type, profiles.name AS driver_name, profiles.languages, driver_infos.car_seats, driver_infos.car_specs,
                             driver_infos.hit_the_road_tariff, driver_infos.tariff1, driver_infos.tariff1, driver_infos.tariff2,
                             driver_infos.car_mark, driver_infos.car_model")
                     .where("logins.user_type = 2 AND driver_infos.hit_the_road_tariff is not null").distinct
