@@ -31,8 +31,10 @@ class ProfilesController < ApplicationController
         profile = user_info
       end
       profile_photo = user_info.photos.where(file_type: 1).first
-      profile_photo.full_path = PhotosHelper::get_photo_full_path(profile_photo.name,  Photo::FILE_TYPES.key(profile_photo.file_type), user_info[:id])
-      profile[:profile_photo] = profile_photo.full_path
+      unless profile_photo.blank?
+        profile_photo.full_path = PhotosHelper::get_photo_full_path(profile_photo.name,  Photo::FILE_TYPES.key(profile_photo.file_type), user_info[:id])
+        profile[:profile_photo] = profile_photo.full_path
+      end
     else
       profile = nil
     end
