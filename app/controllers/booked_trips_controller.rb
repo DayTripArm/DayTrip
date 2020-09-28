@@ -33,7 +33,7 @@ class BookedTripsController < ApplicationController
     begin
       booked_trip = BookedTrip.where({driver_id: params[:user_id], traveler_id: params[:traveler_id], trip_day: params[:day]})
       if booked_trip.blank?
-        new_booked_trip = BookedTrip.new(booked_trips_params
+        new_booked_trip = BookedTrip.new(booked_trips_params)
         new_booked_trip.save
         render json: {message: "Your trip has booked succesfully"}, status: :ok
       else
@@ -47,14 +47,13 @@ class BookedTripsController < ApplicationController
 
   # TODO: Provide API for booked trip slider
   def booked_trip_details
-=begin
     errors = []
     begin
       booked_trip_details = {}
       booked_trip = BookedTrip.where({id: params[:id]})
       unless booked_trip.blank?
-        traveler_info = booked_trip.joins(:profile).where(traveler_id: booked_trip.first.traveler_id).first
-        driver_info = booked_trip.joins(:profile).where(driver_id: booked_trip.first.driver_id).first
+        traveler_info = booked_trip.where(traveler_id: booked_trip.first.traveler_id).first.profile
+        driver_info = booked_trip.where(driver_id: booked_trip.first.driver_id).first.profile
         booked_trip_details[:traveler_info] = traveler_info
         booked_trip_details[:driver_info] = driver_info
         render json: {trip_details: booked_trip_details}, status: :ok
@@ -65,7 +64,6 @@ class BookedTripsController < ApplicationController
       errors << e.message unless e.message.blank?
       render json: errors, status: :internal_server_error
     end
-=end
   end
 
   private

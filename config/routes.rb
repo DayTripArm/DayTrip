@@ -53,5 +53,6 @@ Rails.application.routes.draw do
      # Booked trips
      get "/booked_trips", to: "booked_trips#index"
      post "/booked_trips", to: "booked_trips#create"
+     get "/booked_trips/:id", to: "booked_trips#booked_trip_details"
    end
 end
