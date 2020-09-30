@@ -4,21 +4,21 @@ class BookedTripsController < ApplicationController
     begin
       overview_bookings = []
       calendar_data = []
-      booked_trips_list = BookedTrip.select('booked_trips.id, driver_id, traveler_id, trip_id, trip_day').joins(:login)
+      booked_trips_list = BookedTrip.select('booked_trips.id, driver_id, traveler_id, trip_id, trip_day')
                               .where(driver_id: params[:user_id])
       overview_bookings = JSON.parse(booked_trips_list.to_json)
 
       booked_trips_list.each_with_index do |booked_trip, index|
-        btrip = booked_trips_list.joins(:login).where(traveler_id: booked_trip.traveler_id).first
-        traveler_photos = btrip.photos.blank? ? [] : btrip.photos.get_by_file_type(1)
+        btrip = booked_trip.driver
+        traveler_photos = booked_trip.traveler.photos.blank? ? [] : btrip.photos.get_by_file_type(1)
         calendar_data[index] = JSON.parse(booked_trip.to_json)
         traveler_photos.each do |photo|
           photo.full_path = PhotosHelper::get_photo_full_path(photo.name,  Photo::FILE_TYPES.key(photo.file_type), photo[:login_id].to_s)
           calendar_data[index][:traveler_photos] = photo
         end
-        calendar_data[index][:trip] = { trip_image: '', title: ''}
+        overview_bookings[index][:trip] = { trip_image: '', title: ''}
         unless booked_trip.trip.nil?
-          calendar_data[index][:trip] = { trip_image: booked_trip.trip.images.first, title: booked_trip.trip.title}
+          overview_bookings[index][:trip] = { trip_image: booked_trip.trip.images.first, title: booked_trip.trip.title}
         end
       end
       render json: {calendar_info: calendar_data, overview_trips: overview_bookings}, status: :ok
@@ -50,13 +50,31 @@ class BookedTripsController < ApplicationController
     errors = []
     begin
       booked_trip_details = {}
-      booked_trip = BookedTrip.where({id: params[:id]})
+      booked_trip = BookedTrip.where({id: params[:id]}).first
       unless booked_trip.blank?
-        traveler_info = booked_trip.where(traveler_id: booked_trip.first.traveler_id).first.profile
-        driver_info = booked_trip.where(driver_id: booked_trip.first.driver_id).first.profile
-        booked_trip_details[:traveler_info] = traveler_info
-        booked_trip_details[:driver_info] = driver_info
-        render json: {trip_details: booked_trip_details}, status: :ok
+        booked_trip_details[:trip_tour] = booked_trip.trip.nil? ? {} : {
+            title: booked_trip.trip.title,
+            images: booked_trip.trip.images
+        }
+        booked_trip_details[:trip_info] = {
+                                            trip_day: booked_trip.trip_day,
+                                            travelers_count: booked_trip.travelers_count
+                                          }
+        booked_trip_details[:pickup_info] = {
+                                              pickup_time: booked_trip.pickup_time,
+                                              pickup_location: booked_trip.pickup_location,
+                                              notes: booked_trip.notes
+                                            }
+        traveler_info = {
+                          pickup_time: booked_trip.driver.profile.name,
+                          pickup_location: booked_trip.driver.profile.location,
+                          pickup_location: booked_trip.driver.profile.languages,
+                          notes: booked_trip.driver.profile.phone
+                        }
+        booked_trip_details[:traveler] = traveler_info
+        booked_trip_details[:price] = booked_trip.price
+
+        render json: booked_trip_details, status: :ok
       else
         render json: {message: "Can't find this booked trip."}, status: :ok
       end

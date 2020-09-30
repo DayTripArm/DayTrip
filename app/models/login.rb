@@ -5,7 +5,8 @@ class Login < ApplicationRecord
   has_many :saved_trips
   has_many :trips, through: :saved_trips
   has_many :trip_reviews
-  has_many :booked_trips
+  has_many :driver_booked_trips, class_name: 'BookedTrip', foreign_key: :driver_id
+  has_many :traveler_booked_trips, class_name: 'BookedTrip', foreign_key: :traveler_id
   has_one :calendar_setting, :foreign_key => "driver_id"
   has_many :driver_reviews, :foreign_key => "driver_id"
   accepts_nested_attributes_for :profile
