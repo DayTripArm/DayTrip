@@ -54,7 +54,7 @@ class BookedTripsController < ApplicationController
       unless booked_trip.blank?
         booked_trip_details[:trip_tour] = booked_trip.trip.nil? ? {} : {
             title: booked_trip.trip.title,
-            images: booked_trip.trip.images
+            image: booked_trip.trip.images.first.url
         }
         booked_trip_details[:trip_info] = {
                                             trip_day: booked_trip.trip_day,
