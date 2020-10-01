@@ -4,7 +4,7 @@ class BookedTripsController < ApplicationController
     begin
       overview_bookings = []
       calendar_data = []
-      booked_trips_list = BookedTrip.select('booked_trips.id, driver_id, traveler_id, trip_id, trip_day')
+      booked_trips_list = BookedTrip.select('booked_trips.id, driver_id, traveler_id, trip_id, trip_day, travelers_count')
                               .where(driver_id: params[:user_id])
       overview_bookings = JSON.parse(booked_trips_list.to_json)
 
@@ -18,7 +18,7 @@ class BookedTripsController < ApplicationController
         end
         overview_bookings[index][:trip] = { trip_image: '', title: ''}
         unless booked_trip.trip.nil?
-          overview_bookings[index][:trip] = { trip_image: booked_trip.trip.images.first, title: booked_trip.trip.title}
+          overview_bookings[index][:trip] = { trip_image: booked_trip.trip.images.first.url, title: booked_trip.trip.title}
         end
       end
       render json: {calendar_info: calendar_data, overview_trips: overview_bookings}, status: :ok
