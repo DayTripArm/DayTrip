@@ -52,24 +52,25 @@ class BookedTripsController < ApplicationController
       booked_trip_details = {}
       booked_trip = BookedTrip.where({id: params[:id]}).first
       unless booked_trip.blank?
-        booked_trip_details[:trip_tour] = booked_trip.trip.nil? ? {} : {
+        booked_trip_details[:trip_tour] = booked_trip.trip.blank? ? {} : {
             title: booked_trip.trip.title,
             image: booked_trip.trip.images.first.url
         }
         booked_trip_details[:trip_info] = {
                                             trip_day: booked_trip.trip_day,
-                                            travelers_count: booked_trip.travelers_count
+                                            travelers_count: booked_trip.travelers_count,
+                                            trip_duration: booked_trip.trip.blank? ? 12 : booked_trip.trip.trip_duration
                                           }
         booked_trip_details[:pickup_info] = {
-                                              pickup_time: booked_trip.pickup_time,
+                                              pickup_time: booked_trip.pickup_time.strftime("%I:%M"),
                                               pickup_location: booked_trip.pickup_location,
                                               notes: booked_trip.notes
                                             }
         traveler_info = {
-                          pickup_time: booked_trip.driver.profile.name,
-                          pickup_location: booked_trip.driver.profile.location,
-                          pickup_location: booked_trip.driver.profile.languages,
-                          notes: booked_trip.driver.profile.phone
+                          user_name: booked_trip.driver.profile.name,
+                          location: booked_trip.driver.profile.location,
+                          languages: booked_trip.driver.profile.languages,
+                          phone: booked_trip.driver.profile.phone
                         }
         booked_trip_details[:traveler] = traveler_info
         booked_trip_details[:price] = booked_trip.price
