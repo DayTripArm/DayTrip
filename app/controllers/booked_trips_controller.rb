@@ -2,11 +2,12 @@ class BookedTripsController < ApplicationController
   def index
     errors = []
     begin
-      if params[:drv_id]
+      params[:utype]  =params[:utype].to_i
+      if params[:utype] == 2
         overview_bookings = []
         calendar_data = []
         booked_trips_list = BookedTrip.select('booked_trips.id, driver_id, traveler_id, trip_id, trip_day, travelers_count')
-                                .where(driver_id: params[:drv_id])
+                                .where(driver_id: params[:user_id])
         overview_bookings = JSON.parse(booked_trips_list.to_json)
 
         booked_trips_list.each_with_index do |booked_trip, index|
@@ -17,16 +18,16 @@ class BookedTripsController < ApplicationController
             photo.full_path = PhotosHelper::get_photo_full_path(photo.name,  Photo::FILE_TYPES.key(photo.file_type), photo[:login_id].to_s)
             calendar_data[index][:traveler_photos] = photo
           end
-          overview_bookings[index][:trip] = { trip_image: '', title: ''}
+          overview_bookings[index][:trip] = { trip_image: HitTheRoad.first.image.url, title: 'Hit the Road'}
           unless booked_trip.trip.nil?
             overview_bookings[index][:trip] = { trip_image: booked_trip.trip.images.first.url, title: booked_trip.trip.title}
           end
         end
         render json: {calendar_info: calendar_data, overview_trips: overview_bookings}, status: :ok
-      elsif params[:trv_id]
+      elsif params[:utype] == 1
         travelers_trips = []
         booked_trips_list = BookedTrip.select('booked_trips.id, driver_id, traveler_id, trip_id, trip_day, travelers_count')
-                                .where(traveler_id: params[:trv_id])
+                                .where(traveler_id: params[:user_id])
         travelers_trips = JSON.parse(booked_trips_list.to_json)
 
         booked_trips_list.each_with_index do |booked_trip, index|
@@ -36,6 +37,8 @@ class BookedTripsController < ApplicationController
           end
         end
         render json: {travelers_trips: travelers_trips}, status: :ok
+      else
+        render json: {}, status: :ok
       end
     rescue StandardError, ActiveRecordError => e
       errors << e.message unless e.message.blank?
