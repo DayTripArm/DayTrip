@@ -2,26 +2,41 @@ class BookedTripsController < ApplicationController
   def index
     errors = []
     begin
-      overview_bookings = []
-      calendar_data = []
-      booked_trips_list = BookedTrip.select('booked_trips.id, driver_id, traveler_id, trip_id, trip_day, travelers_count')
-                              .where(driver_id: params[:user_id])
-      overview_bookings = JSON.parse(booked_trips_list.to_json)
+      if params[:drv_id]
+        overview_bookings = []
+        calendar_data = []
+        booked_trips_list = BookedTrip.select('booked_trips.id, driver_id, traveler_id, trip_id, trip_day, travelers_count')
+                                .where(driver_id: params[:drv_id])
+        overview_bookings = JSON.parse(booked_trips_list.to_json)
 
-      booked_trips_list.each_with_index do |booked_trip, index|
-        btrip = booked_trip.driver
-        traveler_photos = booked_trip.traveler.photos.blank? ? [] : btrip.photos.get_by_file_type(1)
-        calendar_data[index] = JSON.parse(booked_trip.to_json)
-        traveler_photos.each do |photo|
-          photo.full_path = PhotosHelper::get_photo_full_path(photo.name,  Photo::FILE_TYPES.key(photo.file_type), photo[:login_id].to_s)
-          calendar_data[index][:traveler_photos] = photo
+        booked_trips_list.each_with_index do |booked_trip, index|
+          btrip = booked_trip.driver
+          traveler_photos = booked_trip.traveler.photos.blank? ? [] : btrip.photos.get_by_file_type(1)
+          calendar_data[index] = JSON.parse(booked_trip.to_json)
+          traveler_photos.each do |photo|
+            photo.full_path = PhotosHelper::get_photo_full_path(photo.name,  Photo::FILE_TYPES.key(photo.file_type), photo[:login_id].to_s)
+            calendar_data[index][:traveler_photos] = photo
+          end
+          overview_bookings[index][:trip] = { trip_image: '', title: ''}
+          unless booked_trip.trip.nil?
+            overview_bookings[index][:trip] = { trip_image: booked_trip.trip.images.first.url, title: booked_trip.trip.title}
+          end
         end
-        overview_bookings[index][:trip] = { trip_image: '', title: ''}
-        unless booked_trip.trip.nil?
-          overview_bookings[index][:trip] = { trip_image: booked_trip.trip.images.first.url, title: booked_trip.trip.title}
+        render json: {calendar_info: calendar_data, overview_trips: overview_bookings}, status: :ok
+      elsif params[:trv_id]
+        travelers_trips = []
+        booked_trips_list = BookedTrip.select('booked_trips.id, driver_id, traveler_id, trip_id, trip_day, travelers_count')
+                                .where(traveler_id: params[:trv_id])
+        travelers_trips = JSON.parse(booked_trips_list.to_json)
+
+        booked_trips_list.each_with_index do |booked_trip, index|
+          travelers_trips[index][:trip] = { trip_image: '', title: ''}
+          unless booked_trip.trip.nil?
+            travelers_trips[index][:trip] = { trip_image: booked_trip.trip.images.first.url, title: booked_trip.trip.title}
+          end
         end
+        render json: {travelers_trips: travelers_trips}, status: :ok
       end
-      render json: {calendar_info: calendar_data, overview_trips: overview_bookings}, status: :ok
     rescue StandardError, ActiveRecordError => e
       errors << e.message unless e.message.blank?
       render json: errors, status: :internal_server_error
