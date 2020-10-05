@@ -2,7 +2,7 @@ class BookedTripsController < ApplicationController
   def index
     errors = []
     begin
-      params[:utype]  =params[:utype].to_i
+      params[:utype] = params[:utype].to_i
       if params[:utype] == 2
         overview_bookings = []
         calendar_data = []
@@ -18,7 +18,8 @@ class BookedTripsController < ApplicationController
             photo.full_path = PhotosHelper::get_photo_full_path(photo.name,  Photo::FILE_TYPES.key(photo.file_type), photo[:login_id].to_s)
             calendar_data[index][:traveler_photos] = photo
           end
-          overview_bookings[index][:trip] = { trip_image: HitTheRoad.first.image.url, title: 'Hit the Road'}
+
+          overview_bookings[index][:trip] = { trip_image: HitTheRoad.where(published: true).first.blank? ? "": HitTheRoad.where(published: true).first.image, title: 'Hit the Road'}
           unless booked_trip.trip.nil?
             overview_bookings[index][:trip] = { trip_image: booked_trip.trip.images.first.url, title: booked_trip.trip.title}
           end
@@ -31,7 +32,7 @@ class BookedTripsController < ApplicationController
         travelers_trips = JSON.parse(booked_trips_list.to_json)
 
         booked_trips_list.each_with_index do |booked_trip, index|
-          travelers_trips[index][:trip] = { trip_image: '', title: ''}
+          travelers_trips[index][:trip] = { trip_image: HitTheRoad.where(published: true).first.blank? ? "": HitTheRoad.where(published: true).first.image, title: 'Hit the Road'}
           unless booked_trip.trip.nil?
             travelers_trips[index][:trip] = { trip_image: booked_trip.trip.images.first.url, title: booked_trip.trip.title}
           end
@@ -85,11 +86,20 @@ class BookedTripsController < ApplicationController
                                               notes: booked_trip.notes
                                             }
         traveler_info = {
+            user_name: booked_trip.traveler.profile.name,
+            location: booked_trip.traveler.profile.location,
+            languages: booked_trip.traveler.profile.languages,
+            phone: booked_trip.traveler.profile.phone
+        }
+        # TODO Add drivers info for travelers booked trip details
+=begin
+        traveler_info = {
                           user_name: booked_trip.driver.profile.name,
                           location: booked_trip.driver.profile.location,
                           languages: booked_trip.driver.profile.languages,
                           phone: booked_trip.driver.profile.phone
                         }
+=end
         booked_trip_details[:traveler] = traveler_info
         booked_trip_details[:price] = booked_trip.price
 
