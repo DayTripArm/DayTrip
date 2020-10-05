@@ -28,11 +28,12 @@ class HomeController < ApplicationController
                       .not("calendar_settings.unavailable_days ->> 'excluded_days' LIKE ?", "%#{params[:date]}%")
       end
       drivers = drivers.limit(params[:limit] || 10).offset(params[:offset] || 0)
-      unless params[:trip_id].blank?
-        trip_details = Trip.select('images, title, trip_duration, start_location').where(id: params[:trip_id])
+      unless params[:trip_id].to_i.zero?
+        trip_details = Trip.select('id, images, title, trip_duration, start_location').where(id: params[:trip_id]).first
         drivers = drivers.order("tariff1 #{params[:sort] || 'ASC'}, tariff2 #{params[:sort] || 'ASC'}")
       else
-        drivers = drivers.where("AND driver_infos.hit_the_road_tariff is not null")
+        trip_details = HitTheRoad.where(published: true).first
+        drivers = drivers.where("driver_infos.hit_the_road_tariff IS NOT  null")
                       .order(hit_the_road_tariff: params[:sort] || 'ASC').distinct
       end
 
