@@ -19,7 +19,7 @@ class BookedTripsController < ApplicationController
             calendar_data[index][:traveler_photos] = photo
           end
 
-          overview_bookings[index][:trip] = { trip_image: HitTheRoad.where(published: true).first.blank? ? "": HitTheRoad.where(published: true).first.image, title: 'Hit the Road'}
+          overview_bookings[index][:trip] = { trip_image: HitTheRoad.where(published: true).first.blank? ? "": HitTheRoad.where(published: true).first.image.url, title: 'Hit the Road'}
           unless booked_trip.trip.nil?
             overview_bookings[index][:trip] = { trip_image: booked_trip.trip.images.first.url, title: booked_trip.trip.title}
           end
