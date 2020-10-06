@@ -72,6 +72,7 @@ class BookedTripsController < ApplicationController
       booked_trip = BookedTrip.where({id: params[:id]}).first
       unless booked_trip.blank?
         booked_trip_details[:trip_tour] = booked_trip.trip.blank? ? {} : {
+            id: booked_trip.trip.id,
             title: booked_trip.trip.title,
             image: booked_trip.trip.images.first.url
         }
