@@ -32,7 +32,7 @@ class BookedTripsController < ApplicationController
         travelers_trips = JSON.parse(booked_trips_list.to_json)
 
         booked_trips_list.each_with_index do |booked_trip, index|
-          travelers_trips[index][:trip] = { trip_image: HitTheRoad.where(published: true).first.blank? ? "": HitTheRoad.where(published: true).first.image, title: 'Hit the Road'}
+          travelers_trips[index][:trip] = { trip_image: HitTheRoad.where(published: true).first.blank? ? "": HitTheRoad.where(published: true).first.image.url, title: 'Hit the Road'}
           unless booked_trip.trip.nil?
             travelers_trips[index][:trip] = { trip_image: booked_trip.trip.images.first.url, title: booked_trip.trip.title}
           end
