@@ -19,7 +19,7 @@ class BookedTripsController < ApplicationController
             calendar_data[index][:traveler_photos] = photo
           end
 
-          overview_bookings[index][:trip] = { trip_image: HitTheRoad.where(published: true).first.blank? ? "": HitTheRoad.where(published: true).first.image.url, title: 'Hit the Road'}
+          overview_bookings[index][:trip] = { trip_image: HitTheRoad.active_hit_the_road.blank? ? "": HitTheRoad.active_hit_the_road.image.url, title: 'Hit the Road'}
           unless booked_trip.trip.nil?
             overview_bookings[index][:trip] = { trip_image: booked_trip.trip.images.first.url, title: booked_trip.trip.title}
           end
@@ -32,7 +32,7 @@ class BookedTripsController < ApplicationController
         travelers_trips = JSON.parse(booked_trips_list.to_json)
 
         booked_trips_list.each_with_index do |booked_trip, index|
-          travelers_trips[index][:trip] = { trip_image: HitTheRoad.where(published: true).first.blank? ? "": HitTheRoad.where(published: true).first.image.url, title: 'Hit the Road'}
+          travelers_trips[index][:trip] = { trip_image: HitTheRoad.active_hit_the_road.blank? ? "": HitTheRoad.active_hit_the_road.image.url, title: 'Hit the Road'}
           unless booked_trip.trip.nil?
             travelers_trips[index][:trip] = { trip_image: booked_trip.trip.images.first.url, title: booked_trip.trip.title}
           end
@@ -71,7 +71,11 @@ class BookedTripsController < ApplicationController
       booked_trip_details = {}
       booked_trip = BookedTrip.where({id: params[:id]}).first
       unless booked_trip.blank?
-        booked_trip_details[:trip_tour] = booked_trip.trip.blank? ? {} : {
+        booked_trip_details[:trip_tour] = booked_trip.trip.blank? ? {
+            id: HitTheRoad.active_hit_the_road.blank? ? nil: HitTheRoad.active_hit_the_road.id,
+            title: 'Hit the Road',
+            image: HitTheRoad.active_hit_the_road.blank? ? "": HitTheRoad.active_hit_the_road.image.url
+        } : {
             id: booked_trip.trip.id,
             title: booked_trip.trip.title,
             image: booked_trip.trip.images.first.url

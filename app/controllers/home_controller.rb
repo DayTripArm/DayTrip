@@ -5,7 +5,7 @@ class HomeController < ApplicationController
   end
 
   def hit_the_road
-    hit_the_road = HitTheRoad.where(published: true).first
+    hit_the_road = HitTheRoad.active_hit_the_road
     render json: hit_the_road, status: :ok
   end
 
@@ -32,7 +32,7 @@ class HomeController < ApplicationController
         trip_details = Trip.select('id, images, title, trip_duration, start_location').where(id: params[:trip_id]).first
         drivers = drivers.order("tariff1 #{params[:sort] || 'ASC'}, tariff2 #{params[:sort] || 'ASC'}")
       else
-        trip_details = HitTheRoad.where(published: true).first
+        trip_details = HitTheRoad.active_hit_the_road
         drivers = drivers.where("driver_infos.hit_the_road_tariff IS NOT  null")
                       .order(hit_the_road_tariff: params[:sort] || 'ASC').distinct
       end
