@@ -2,7 +2,12 @@ class ProfilesController < ApplicationController
   #TODO Albert: Add GET and POST methods to retrieve and update profile info
   def get_info
     if params[:profile] == 'personal'
-      profile = Login.exclude_fields.joins(:profile).where(id: params[:id]).first
+      profile_info = Login.exclude_fields.joins(:profile).where(id: params[:id]).first
+      profile_photo = profile_info.photos.where(file_type: 1).first
+      profile = profile_info.as_json
+      unless profile_photo.blank?
+        profile[:profile_photo] = PhotosHelper::get_photo_full_path(profile_photo.name,  Photo::FILE_TYPES.key(profile_photo.file_type), profile_info[:id])
+      end
     elsif params[:profile] == 'payments'
       #TODO Albert: Add user payments info part
     elsif params[:profile] == "user_profile"
@@ -32,8 +37,7 @@ class ProfilesController < ApplicationController
       end
       profile_photo = user_info.photos.where(file_type: 1).first
       unless profile_photo.blank?
-        profile_photo.full_path = PhotosHelper::get_photo_full_path(profile_photo.name,  Photo::FILE_TYPES.key(profile_photo.file_type), user_info[:id])
-        profile[:profile_photo] = profile_photo.full_path
+        profile[:profile_photo] = PhotosHelper::get_photo_full_path(profile_photo.name,  Photo::FILE_TYPES.key(profile_photo.file_type), user_info[:id])
       end
     else
       profile = nil
@@ -44,11 +48,17 @@ class ProfilesController < ApplicationController
   def update_info
     if params[:profile] == 'personal'
       profile = Profile.where(login_id: params[:id]).first
-      profile.update_attributes(profile_params)
-      if !profile.save
-        render json: { errors: profile.errors.full_messages }, status: :bad_request
-      else
+      file_save = PhotosHelper::upload_and_save_photos(Login.where({id: params[:id]}).first, 1, "profile_photos", params[:profile_photos]) unless params[:profile_photos].blank?
+      if file_save
         render json: { message: "Profile info has been updated." }, status: :ok
+      end
+      unless params[:profile_info].blank?
+        profile.update_attributes(profile_params)
+        if !profile.save
+          render json: { errors: profile.errors.full_messages }, status: :bad_request
+        else
+          render json: { message: "Profile info has been updated." }, status: :ok
+        end
       end
     elsif params[:profile] == 'login'
       login = Login.where(id: params[:id]).first
