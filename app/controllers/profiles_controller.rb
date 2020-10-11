@@ -48,6 +48,10 @@ class ProfilesController < ApplicationController
   def update_info
     if params[:profile] == 'personal'
       profile = Profile.where(login_id: params[:id]).first
+      unless profile.login.photos.where(file_type: 1).blank?
+        profile.login.photos.where(file_type: 1).delete_all
+        FileUtils.rm_rf(Dir[File.join("public", "/uploads", "profile_photos", params[:id].to_s, "*")])
+      end
       file_save = PhotosHelper::upload_and_save_photos(Login.where({id: params[:id]}).first, 1, "profile_photos", params[:profile_photos]) unless params[:profile_photos].blank?
       if file_save
         render json: { message: "Profile info has been updated." }, status: :ok
