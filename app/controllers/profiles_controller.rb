@@ -33,7 +33,7 @@ class ProfilesController < ApplicationController
         profile[:reviews_count] = user_info.driver_reviews.count()
         profile[:reviews] = user_info.driver_reviews
       else
-        profile = user_info
+        profile = user_info.as_json
       end
       profile_photo = user_info.photos.where(file_type: 1).first
       unless profile_photo.blank?
@@ -48,13 +48,15 @@ class ProfilesController < ApplicationController
   def update_info
     if params[:profile] == 'personal'
       profile = Profile.where(login_id: params[:id]).first
-      unless profile.login.photos.where(file_type: 1).blank?
-        profile.login.photos.where(file_type: 1).delete_all
-        FileUtils.rm_rf(Dir[File.join("public", "/uploads", "profile_photos", params[:id].to_s, "*")])
-      end
-      file_save = PhotosHelper::upload_and_save_photos(Login.where({id: params[:id]}).first, 1, "profile_photos", params[:profile_photos]) unless params[:profile_photos].blank?
-      if file_save
-        render json: { message: "Profile info has been updated." }, status: :ok
+      unless params[:profile_photos].blank?
+        unless profile.login.photos.where(file_type: 1).blank?
+          profile.login.photos.where(file_type: 1).delete_all
+          FileUtils.rm_rf(Dir[File.join("public", "/uploads", "profile_photos", params[:id].to_s, "*")])
+        end
+        file_save = PhotosHelper::upload_and_save_photos(Login.where({id: params[:id]}).first, 1, "profile_photos", params[:profile_photos])
+        if file_save
+          render json: { message: "Profile info has been updated." }, status: :ok
+        end
       end
       unless params[:profile_info].blank?
         profile.update_attributes(profile_params)
