@@ -11,13 +11,10 @@ class BookedTripsController < ApplicationController
         overview_bookings = JSON.parse(booked_trips_list.to_json)
 
         booked_trips_list.each_with_index do |booked_trip, index|
-          btrip = booked_trip.driver
-          traveler_photos = booked_trip.traveler.photos.blank? ? [] : btrip.photos.get_by_file_type(1)
+          btrip = booked_trip.traveler
+          traveler_photo = btrip.photos.blank? ? [] : btrip.photos.get_by_file_type(1).first
           calendar_data[index] = JSON.parse(booked_trip.to_json)
-          traveler_photos.each do |photo|
-            photo.full_path = PhotosHelper::get_photo_full_path(photo.name,  Photo::FILE_TYPES.key(photo.file_type), photo[:login_id].to_s)
-            calendar_data[index][:traveler_photos] = photo
-          end
+          calendar_data[index][:traveler_photo] = PhotosHelper::get_photo_full_path(traveler_photo.name,  Photo::FILE_TYPES.key(traveler_photo.file_type), traveler_photo[:login_id].to_s) unless traveler_photo.blank?
 
           overview_bookings[index][:trip] = { trip_image: HitTheRoad.active_hit_the_road.blank? ? "": HitTheRoad.active_hit_the_road.image.url, title: 'Hit the Road'}
           unless booked_trip.trip.nil?
