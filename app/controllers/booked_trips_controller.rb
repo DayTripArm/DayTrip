@@ -87,8 +87,12 @@ class BookedTripsController < ApplicationController
                                               pickup_location: booked_trip.pickup_location,
                                               notes: booked_trip.notes
                                             }
+        traveler_photo = booked_trip.traveler.blank? ? [] : booked_trip.traveler.photos.get_by_file_type(1).first
+        profile_photo = PhotosHelper::get_photo_full_path(traveler_photo.name, Photo::FILE_TYPES.key(traveler_photo.file_type), traveler_photo[:login_id].to_s) unless traveler_photo.blank?
+
         traveler_info = {
             user_name: booked_trip.traveler.profile.name,
+            profile_photo: profile_photo || "",
             location: booked_trip.traveler.profile.location,
             languages: booked_trip.traveler.profile.languages,
             phone: booked_trip.traveler.profile.phone
