@@ -87,26 +87,22 @@ class BookedTripsController < ApplicationController
                                               pickup_location: booked_trip.pickup_location,
                                               notes: booked_trip.notes
                                             }
-        traveler_photo = booked_trip.traveler.blank? ? [] : booked_trip.traveler.photos.get_by_file_type(1).first
-        profile_photo = PhotosHelper::get_photo_full_path(traveler_photo.name, Photo::FILE_TYPES.key(traveler_photo.file_type), traveler_photo[:login_id].to_s) unless traveler_photo.blank?
-
-        traveler_info = {
-            user_name: booked_trip.traveler.profile.name,
+        if params[:utype] == "1"
+          user_trip = booked_trip.traveler
+        end
+        if params[:utype] == "2"
+          user_trip = booked_trip.driver
+        end
+        user_photo = user_trip.blank? ? [] : user_trip.photos.get_by_file_type(1).first
+        profile_photo = PhotosHelper::get_photo_full_path(user_photo.name, Photo::FILE_TYPES.key(user_photo.file_type), user_photo[:login_id].to_s) unless user_photo.blank?
+        user_info = user_trip.blank? ? {} : {
+            user_name: user_trip.profile.name,
             profile_photo: profile_photo || "",
-            location: booked_trip.traveler.profile.location,
-            languages: booked_trip.traveler.profile.languages,
-            phone: booked_trip.traveler.profile.phone
+            location: user_trip.profile.location,
+            languages: user_trip.profile.languages,
+            phone: user_trip.profile.phone
         }
-        # TODO Add drivers info for travelers booked trip details
-=begin
-        traveler_info = {
-                          user_name: booked_trip.driver.profile.name,
-                          location: booked_trip.driver.profile.location,
-                          languages: booked_trip.driver.profile.languages,
-                          phone: booked_trip.driver.profile.phone
-                        }
-=end
-        booked_trip_details[:traveler] = traveler_info
+        booked_trip_details[:user_info] = user_info
         booked_trip_details[:price] = booked_trip.price
 
         render json: booked_trip_details, status: :ok
