@@ -14,7 +14,7 @@ class BookedTripsController < ApplicationController
           btrip = booked_trip.traveler
           traveler_photo = btrip.photos.blank? ? [] : btrip.photos.get_by_file_type(1).first
           calendar_data[index] = JSON.parse(booked_trip.to_json)
-          calendar_data[index][:traveler_photo] = PhotosHelper::get_photo_full_path(traveler_photo.name,  Photo::FILE_TYPES.key(traveler_photo.file_type), traveler_photo[:login_id].to_s) unless traveler_photo.blank?
+          calendar_data[index][:traveler_photo] = traveler_photo.blank? ? File.join("/uploads","profile_photos","blank-profile.png") : PhotosHelper::get_photo_full_path(traveler_photo.name, "profile_photos", traveler_photo[:login_id].to_s)
 
           overview_bookings[index][:trip] = { trip_image: HitTheRoad.active_hit_the_road.blank? ? "": HitTheRoad.active_hit_the_road.image.url, title: 'Hit the Road'}
           unless booked_trip.trip.nil?
@@ -94,10 +94,10 @@ class BookedTripsController < ApplicationController
           user_trip = booked_trip.driver
         end
         user_photo = user_trip.blank? ? [] : user_trip.photos.get_by_file_type(1).first
-        profile_photo = PhotosHelper::get_photo_full_path(user_photo.name, Photo::FILE_TYPES.key(user_photo.file_type), user_photo[:login_id].to_s) unless user_photo.blank?
+        profile_photo = user_photo.blank? ? File.join("/uploads","profile_photos","blank-profile.png") :  PhotosHelper::get_photo_full_path(user_photo.name, Photo::FILE_TYPES.key(user_photo.file_type), user_photo[:login_id].to_s)
         user_info = user_trip.blank? ? {} : {
             user_name: user_trip.profile.name,
-            profile_photo: profile_photo || "",
+            profile_photo: profile_photo,
             location: user_trip.profile.location,
             languages: user_trip.profile.languages,
             phone: user_trip.profile.phone
