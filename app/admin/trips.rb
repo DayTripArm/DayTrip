@@ -88,8 +88,9 @@ ActiveAdmin.register Trip do
       row 'Destinations' do
         ul do
           trip.destinations_in_trips.each do |dip|
+            dest_title = dip.destination.nil? ? "" : dip.destination.title + " - "
             li do
-              dip.destination.title + " - " +  dip.stops_title
+              dest_title +  dip.stops_title
             end
           end
         end
