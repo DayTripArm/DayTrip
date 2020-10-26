@@ -17,9 +17,9 @@ module TripsHelper
     trip.destinations_in_trips.each do | trip_dest|
       dests << {
           stop_title: trip_dest.stops_title,
-          dest_title: trip_dest.destination.title,
-          dest_desc: trip_dest.destination.description,
-          dest_image: trip_dest.destination.image
+          dest_title: trip_dest.destination.nil? ? "" : trip_dest.destination.title,
+          dest_desc: trip_dest.destination.nil? ? "" : trip_dest.destination.description,
+          dest_image: trip_dest.destination.nil? ? "" : trip_dest.destination.image
       }
     end
     dests
