@@ -24,8 +24,8 @@ class HomeController < ApplicationController
       end
       unless params[:date].blank?
 
-        drivers = drivers.joins(:calendar_setting).where
-                      .not("calendar_settings.unavailable_days ->> 'excluded_days' LIKE ?", "%#{params[:date]}%")
+        drivers = drivers.joins(:calendar_setting)
+                      .where("calendar_settings.available_days ->> 'included_days' LIKE ?", "%#{params[:date]}%")
       end
       drivers = drivers.limit(params[:limit] || 10).offset(params[:offset] || 0)
       unless params[:trip_id].to_i.zero?
