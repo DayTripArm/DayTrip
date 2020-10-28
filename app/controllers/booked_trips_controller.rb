@@ -100,7 +100,9 @@ class BookedTripsController < ApplicationController
             profile_photo: profile_photo,
             location: user_trip.profile.location,
             languages: user_trip.profile.languages,
-            phone: user_trip.profile.phone
+            phone: user_trip.profile.phone,
+            about: user_trip.profile.about,
+            created_at: user_trip.profile.login.created_at
         }
         booked_trip_details[:user_info] = user_info
         booked_trip_details[:price] = booked_trip.price
