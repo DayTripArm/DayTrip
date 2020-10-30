@@ -45,6 +45,7 @@ Rails.application.routes.draw do
      get "/saved_trips", to: "trips#get_saved_trips"
 
      post "/driver_reviews", to: "driver_reviews#create"
+     get "/price_list", to: "home#price_list"
 
      # Calendar settings
      get "/calendar_settings/:id", to: "calendar_settings#edit"

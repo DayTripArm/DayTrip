@@ -28,13 +28,15 @@ class HomeController < ApplicationController
                       .where("calendar_settings.available_days ->> 'included_days' LIKE ?", "%#{params[:date]}%")
       end
       drivers = drivers.limit(params[:limit] || 10).offset(params[:offset] || 0)
+      params[:price_range] = params[:price_range].split(',')
       unless params[:trip_id].to_i.zero?
         trip_details = Trip.select('id, images, title, trip_duration, start_location').where(id: params[:trip_id]).first
-        drivers = drivers.order("tariff1 #{params[:sort] || 'ASC'}, tariff2 #{params[:sort] || 'ASC'}")
+        drivers = drivers.where("(tariff1 >= (?) and tariff1 <= (?)) or (tariff2 >= (?) and tarrif2 <= (?))",
+                                params[:price_range]? params[:price_range][0]: 10, params[:price_range]? params[:price_range][1]: 100000)
       else
         trip_details = HitTheRoad.active_hit_the_road
-        drivers = drivers.where("driver_infos.hit_the_road_tariff IS NOT  null")
-                      .order(hit_the_road_tariff: params[:sort] || 'ASC').distinct
+        drivers = drivers.where("driver_infos.hit_the_road_tariff IS NOT null AND hit_the_road_tariff >= (?) AND hit_the_road_tariff <= (?)",
+                                params[:price_range]? params[:price_range][0]: 10, params[:price_range]? params[:price_range][1]: 100000).distinct
       end
 
       drivers.each_with_index do |driver, index|
@@ -52,6 +54,21 @@ class HomeController < ApplicationController
       end
 
       render json: {trip_details: trip_details, drivers_list: drivers_list}, status: :ok
+    rescue StandardError, ActiveRecordError => e
+      errors << e.message unless e.message.blank?
+      render json: errors, status: :internal_server_error
+    end
+  end
+
+  def price_list
+    errors = []
+    begin
+      select = "tariff1 as price, tariff2 as price, count(tariff1) as price_count, count(tariff2) as price_count" if params[:is_trip]
+      group_by = "tariff1, tariff2 " if params[:is_trip]
+      group_by = "hit_the_road_tariff"
+      select = "hit_the_road_tariff as price, count(hit_the_road_tariff) as price_count"
+      prices_list = DriverInfo.select(select).group(group_by)
+      render json: prices_list, status: :ok
     rescue StandardError, ActiveRecordError => e
       errors << e.message unless e.message.blank?
       render json: errors, status: :internal_server_error
