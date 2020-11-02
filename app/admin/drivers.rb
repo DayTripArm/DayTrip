@@ -5,8 +5,8 @@ ActiveAdmin.register Profile, as: "Drivers" do
   scope "Suspended", :drivers_suspended
   scope "Pending Approval", :drivers_pending
 
-  actions :index, :show
-  index do
+  actions :index, :show, :destroy
+    index do
     column :name
     column :phone
     column :status do |resource|
@@ -73,6 +73,9 @@ ActiveAdmin.register Profile, as: "Drivers" do
   show do
     attributes_table do
       row :name
+      row "Email" do |driver|
+        driver.login.email
+      end
       row :gender
       row :phone
       row :date_of_birth
@@ -82,7 +85,7 @@ ActiveAdmin.register Profile, as: "Drivers" do
           gov_photos = Photo.where({login_id: params[:id], file_type: Photo::GOV})
           gov_photos.each do |gp|
             li do
-              image_tag(PhotosHelper::get_photo_full_path(gp.name, "gov_photos", params[:id]))
+              image_tag(PhotosHelper::get_photo_full_path(gp.name, "gov_photos", params[:id]), width:'50%', height:'50%')
             end
           end
         end
