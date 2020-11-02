@@ -31,8 +31,10 @@ class HomeController < ApplicationController
       params[:price_range] = params[:price_range].split(',')
       unless params[:trip_id].to_i.zero?
         trip_details = Trip.select('id, images, title, trip_duration, start_location').where(id: params[:trip_id]).first
-        drivers = drivers.where("(tariff1 >= (?) and tariff1 <= (?)) or (tariff2 >= (?) and tarrif2 <= (?))",
-                                params[:price_range]? params[:price_range][0]: 10, params[:price_range]? params[:price_range][1]: 100000)
+        min = params[:price_range].blank? ? 10: params[:price_range][0]
+        max = params[:price_range].blank? ? 100000: params[:price_range][1]
+        drivers = drivers.where("(tariff1 >= :min and tariff1 <= :max) or (tariff2 >= :min and tariff2 <= :max)",
+                                min: min, max: max)
       else
         trip_details = HitTheRoad.active_hit_the_road
         drivers = drivers.where("driver_infos.hit_the_road_tariff IS NOT null AND hit_the_road_tariff >= (?) AND hit_the_road_tariff <= (?)",
