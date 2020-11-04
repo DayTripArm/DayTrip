@@ -5,9 +5,12 @@ class TripsController < ApplicationController
     if params[:query]
       trips = trips.searched_trips(params[:query])
       trips_arr = trips
+      render json: trips_arr, status: :ok
     else
       trips = trips.filter_trips(params[:limit], params[:offset])
       trips = trips.top_choices if params[:is_top_choice] === 'true'
+      tripsTotalCount = trips.size
+      trips = trips.limit(params[:limit] || 12).offset(params[:offset] || 0)
       trips.each_with_index do |trip, index|
         trips_arr[index] = {
             trip: trip,
@@ -18,8 +21,8 @@ class TripsController < ApplicationController
             }
         }
       end
+      render json: {tripsList: trips_arr, tripsTotalCount: tripsTotalCount}, status: :ok
     end
-    render json: trips_arr, status: :ok
   end
 
   def trip_individual
