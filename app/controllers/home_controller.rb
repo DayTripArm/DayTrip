@@ -27,7 +27,6 @@ class HomeController < ApplicationController
         drivers = drivers.joins(:calendar_setting)
                       .where("calendar_settings.available_days ->> 'included_days' LIKE ?", "%#{params[:date]}%")
       end
-      drivers = drivers.limit(params[:limit] || 10).offset(params[:offset] || 0)
       params[:price_range] = params[:price_range].split(',')
       unless params[:trip_id].to_i.zero?
         trip_details = Trip.select('id, images, title, trip_duration, start_location').where(id: params[:trip_id]).first
@@ -40,6 +39,8 @@ class HomeController < ApplicationController
         drivers = drivers.where("driver_infos.hit_the_road_tariff IS NOT null AND hit_the_road_tariff >= (?) AND hit_the_road_tariff <= (?)",
                                 params[:price_range]? params[:price_range][0]: 10, params[:price_range]? params[:price_range][1]: 100000).distinct
       end
+      totalCount = drivers.size
+      drivers = drivers.limit(params[:limit] || 5).offset(params[:offset] || 0)
 
       drivers.each_with_index do |driver, index|
         drivers_list[index] = driver.to_json
@@ -55,7 +56,7 @@ class HomeController < ApplicationController
         drivers_list[index][:car_full_name] = CarHelper::format_car_model(driver[:car_mark].to_i, driver[:car_model].to_i)
       end
 
-      render json: {trip_details: trip_details, drivers_list: drivers_list}, status: :ok
+      render json: {trip_details: trip_details, drivers_list: drivers_list, driversTotalCount: totalCount}, status: :ok
     rescue StandardError, ActiveRecordError => e
       errors << e.message unless e.message.blank?
       render json: errors, status: :internal_server_error
