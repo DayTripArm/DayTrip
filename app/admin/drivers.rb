@@ -84,8 +84,8 @@ ActiveAdmin.register Profile, as: "Drivers" do
         ul do
           gov_photos = Photo.where({login_id: params[:id], file_type: Photo::GOV})
           gov_photos.each do |gp|
-            li do
-              image_tag(PhotosHelper::get_photo_full_path(gp.name, "gov_photos", params[:id]), width:'600px', height:'550px')
+            li class: "no_ponter" do
+              image_tag(PhotosHelper::get_photo_full_path(gp.name, "gov_photos", params[:id]), class:'image_container')
             end
           end
         end
@@ -94,8 +94,8 @@ ActiveAdmin.register Profile, as: "Drivers" do
         ul do
           driving_license = Photo.where({login_id: params[:id], file_type: Photo::LICENSE})
           driving_license.each do |dl|
-            li do
-              image_tag(PhotosHelper::get_photo_full_path(dl.name, "license_photos", params[:id]), width:'600px', height:'550px')
+            li class: "no_ponter" do
+              image_tag(PhotosHelper::get_photo_full_path(dl.name, "license_photos", params[:id]), class:'image_container')
             end
           end
         end
@@ -104,8 +104,8 @@ ActiveAdmin.register Profile, as: "Drivers" do
         ul do
           driving_license = Photo.where({login_id: params[:id], file_type: Photo::REG_CARD})
           driving_license.each do |dl|
-            li do
-              image_tag(PhotosHelper::get_photo_full_path(dl.name, "reg_card_photos", params[:id]), width:'600px', height:'550px')
+            li class: "no_ponter" do
+              image_tag(PhotosHelper::get_photo_full_path(dl.name, "reg_card_photos", params[:id]), class:'image_container')
             end
           end
         end
@@ -114,8 +114,8 @@ ActiveAdmin.register Profile, as: "Drivers" do
         ul do
           car_photos = Photo.where({login_id: params[:id], file_type: Photo::CAR})
           car_photos.each do |cp|
-            li do
-              image_tag(PhotosHelper::get_photo_full_path(cp.name, "car_photos", params[:id]), width:'300px', height:'250px')
+            li class: "no_ponter" do
+              image_tag(PhotosHelper::get_photo_full_path(cp.name, "car_photos", params[:id]), class: 'image_container')
             end
           end
         end
@@ -124,8 +124,8 @@ ActiveAdmin.register Profile, as: "Drivers" do
         ul do
           prof_photos = Photo.where({login_id: params[:id], file_type: Photo::PROFILE})
           prof_photos.each do |pp|
-            li do
-              image_tag(PhotosHelper::get_photo_full_path(pp.name, "profile_photos", params[:id]), width:'300px', height:'250px')
+            li class: "no_ponter" do
+              image_tag(PhotosHelper::get_photo_full_path(pp.name, "profile_photos", params[:id]), class: "image_container")
             end
           end
         end

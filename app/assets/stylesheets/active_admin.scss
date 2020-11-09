@@ -48,3 +48,11 @@ select[multiple] > option {
     background-color: #FF0000;
   }
 }
+.image_container {
+  width: 760px;
+  height: 540px;
+  object-fit: contain;
+}
+.no_ponter{
+  list-style:none;
+}
