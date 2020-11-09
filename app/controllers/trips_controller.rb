@@ -2,6 +2,7 @@ class TripsController < ApplicationController
   def index
     trips_arr = Array.new()
     trips = Trip.active_trips
+    tripsTotalCount = trips.size
     if params[:query]
       trips = trips.searched_trips(params[:query])
       trips_arr = trips
@@ -9,7 +10,6 @@ class TripsController < ApplicationController
     else
       trips = trips.filter_trips(params[:limit], params[:offset])
       trips = trips.top_choices if params[:is_top_choice] === 'true'
-      tripsTotalCount = trips.size
       trips = trips.limit(params[:limit] || 12).offset(params[:offset] || 0)
       trips.each_with_index do |trip, index|
         trips_arr[index] = {
