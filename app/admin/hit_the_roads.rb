@@ -28,7 +28,7 @@ ActiveAdmin.register HitTheRoad do
         htr.description.html_safe
       end
       row :image do |htr|
-        image_tag htr.image.url
+        image_tag htr.image.url, :class => "image_container"
       end
       row :published
       row :created_at

@@ -21,7 +21,9 @@
 //   .status_tag { background: #6090DB; }
 
 //Custom CSS styles for back office
-
+#wrapper .flashes .flash_alert{
+  background-color: red;
+}
 select[multiple] > option {
   font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
   line-height: 1.5em !important;
@@ -47,4 +49,12 @@ select[multiple] > option {
   &.red{
     background-color: #FF0000;
   }
+}
+.image_container {
+  width: 760px;
+  height: 540px;
+  object-fit: contain;
+}
+.no_ponter{
+  list-style:none;
 }

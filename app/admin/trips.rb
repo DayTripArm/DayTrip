@@ -65,8 +65,8 @@ ActiveAdmin.register Trip do
       row :images do
         ul do
           trip.images.each do |image|
-            li do
-              image_tag(image.url)
+            li class: "no_ponter" do
+              image_tag(image.url, class: "image_container")
             end
           end
         end
@@ -79,8 +79,8 @@ ActiveAdmin.register Trip do
       row :map_image do
         ul do
           trip.map_image.each do |image|
-            li do
-              image_tag(image.url)
+            li class: "no_ponter" do
+              image_tag(image.url, class: "image_container")
             end
           end
         end

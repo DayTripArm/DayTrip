@@ -4,7 +4,7 @@ class Trip < ApplicationRecord
   has_many :saved_trips
   has_many :logins, through: :saved_trips
   has_many :trip_reviews
-  has_many :booked_trips
+  has_many :booked_trips, :dependent => :restrict_with_error
 
   accepts_nested_attributes_for :destinations_in_trips, :allow_destroy => true
 
@@ -23,5 +23,5 @@ class Trip < ApplicationRecord
   scope :top_choices, ->  { where(:is_top_choice => true) }
 
   validates :destinations_in_trips, presence: { :message => "must be selected." }
-
+  validates_presence_of :images
 end

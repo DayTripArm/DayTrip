@@ -32,7 +32,7 @@ ActiveAdmin.register Hero do
       row :btn_title
       row :btn_link
       row :image do |h|
-        image_tag h.image.url
+        image_tag h.image.url, :class => "image_container"
       end
       row :published
       row :created_at
