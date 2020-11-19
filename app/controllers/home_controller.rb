@@ -17,7 +17,7 @@ class HomeController < ApplicationController
                     .select("logins.id, logins.user_type, profiles.name AS driver_name, profiles.languages, driver_infos.car_seats, driver_infos.car_specs,
                             driver_infos.hit_the_road_tariff, driver_infos.tariff1, driver_infos.tariff1, driver_infos.tariff2,
                             driver_infos.car_mark, driver_infos.car_model")
-                    .where("logins.user_type = 2").distinct
+                    .where("logins.user_type = 2 and profiles.status = 2").distinct
 
       unless params[:travelers].blank?
         drivers = drivers.where("car_seats >= ?", params[:travelers].to_i)
