@@ -23,5 +23,16 @@ class Trip < ApplicationRecord
   scope :top_choices, ->  { where(:is_top_choice => true) }
 
   validates :destinations_in_trips, presence: { :message => "must be selected." }
+  validates_presence_of :title
   validates_presence_of :images
+  validates_presence_of :trip_duration
+  validates_presence_of :start_location
+  validate :active_booking, on: :update
+  def active_booking
+    booking  = self.booked_trips
+    if !self.published? && booking.any?{|s| Date.today.before?(Date.parse(s.trip_day.to_s))}
+      self.errors[:base] << "Trip can not be unpublished. It has upcoming booked trip."
+    end
+
+  end
 end
