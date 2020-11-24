@@ -66,15 +66,25 @@ class HomeController < ApplicationController
   def price_list
     errors = []
     begin
-      select = "tariff1 as price, tariff2 as price, count(tariff1) as price_count, count(tariff2) as price_count" if params[:is_trip]
-      group_by = "tariff1, tariff2 " if params[:is_trip]
       group_by = "hit_the_road_tariff"
-      select = "hit_the_road_tariff as price, count(hit_the_road_tariff) as price_count"
+      select = "hit_the_road_tariff as price1, count(hit_the_road_tariff) as price_count1"
+      select = "tariff1 as price1, tariff2 as price2, count(tariff1) as price_count1, count(tariff2) as price_count2" if params[:is_trip] === 'true'
+      group_by = "tariff1, tariff2 " if params[:is_trip] === 'true'
       prices_list = DriverInfo.select(select).group(group_by)
-      render json: prices_list, status: :ok
+      render json:  get_price_list_obj(prices_list), status: :ok
     rescue StandardError, ActiveRecordError => e
       errors << e.message unless e.message.blank?
       render json: errors, status: :internal_server_error
     end
+  end
+
+  def get_price_list_obj list
+    prices_count = {}
+    list.each do |item|
+      prices_count[item.price1] = item.price_count1 unless item.price1.blank?
+      prices_count[item.price2] += item.price_count2 unless prices_count[item.price2].blank?
+      prices_count[item.price2] = item.price_count2 if !item.price2.blank? && prices_count[item.price2].blank?
+    end
+    prices_count
   end
 end
