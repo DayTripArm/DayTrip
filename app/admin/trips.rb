@@ -22,6 +22,7 @@ ActiveAdmin.register Trip do
   filter :published
 
   form do |f|
+    f.semantic_errors *f.object.errors.keys
     f.inputs do
       f.input :title
       f.input :images, as: :file, input_html: { multiple: true }
@@ -32,7 +33,6 @@ ActiveAdmin.register Trip do
       f.input :published
     end
     f.inputs 'Choose Trip Destinations' do
-      f.semantic_errors *f.object.errors.keys
       f.has_many :destinations_in_trips,
                  new_record: 'Add Destination',
                  sortable: :position,
