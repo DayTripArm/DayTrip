@@ -68,6 +68,7 @@ class HomeController < ApplicationController
     begin
       group_by = "hit_the_road_tariff"
       select = "hit_the_road_tariff as price1, count(hit_the_road_tariff) as price_count1"
+      group_by = "price1"
       select = "tariff1 as price1, tariff2 as price2, count(tariff1) as price_count1, count(tariff2) as price_count2" if params[:is_trip] === 'true'
       group_by = "tariff1, tariff2 " if params[:is_trip] === 'true'
       prices_list = DriverInfo.select(select).group(group_by)
@@ -82,8 +83,13 @@ class HomeController < ApplicationController
     prices_count = {}
     list.each do |item|
       prices_count[item.price1] = item.price_count1 unless item.price1.blank?
-      prices_count[item.price2] += item.price_count2 unless prices_count[item.price2].blank?
-      prices_count[item.price2] = item.price_count2 if !item.price2.blank? && prices_count[item.price2].blank?
+      if item.respond_to?(:price2)
+        if prices_count[item.price2].blank?
+          prices_count[item.price2] = item.price_count2
+        else
+          prices_count[item.price2] += item.price_count2
+        end
+      end
     end
     prices_count
   end
