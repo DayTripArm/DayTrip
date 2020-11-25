@@ -1,4 +1,6 @@
 class Login < ApplicationRecord
+  devise :confirmable
+
   has_one :profile
   has_one :driver_info
   has_many :photos
