@@ -1,5 +1,6 @@
 class AuthController < ApplicationController
   def login
+      confirm_account
       user = Login.joins(:profile).select("logins.*, profiles.name").find_by(email: params[:email])
       if user && user.authenticate(params[:password])
         render json: payload(user), status: :ok
@@ -8,6 +9,23 @@ class AuthController < ApplicationController
       else
         render json: {errors: { general: I18n.t('sign_in.incorrect_creds') }}, status: :unauthorized
       end
+  end
+
+  def confirm_account
+    unless params[:confirmation_token].blank?
+      user = Login.where(confirmation_token: params[:confirmation_token]).first
+      unless user.blank?
+        if user.confirmed_at.blank?
+          user.confirmed_at = DateTime.current_time
+          user.save!
+        end
+        render json: payload(user), status: :ok
+      else
+        render json: {user: {}}, status: :ok
+      end
+    else
+      render json: {user: {}}, status: :ok
+    end
   end
 
   private
