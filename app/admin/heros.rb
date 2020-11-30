@@ -1,10 +1,13 @@
 ActiveAdmin.register Hero do
-  permit_params :title, :description, :btn_title, :btn_link, :published, :image
+  permit_params :lang, :title, :description, :btn_title, :btn_link, :published, :image
 
+  LANGUAGES = [["English","en"], ["Russian","ru"], ["Armenian","am"]]
+  
   index do
     column :title
     column :created_at
     column :published
+	column :lang
     actions
   end
 
@@ -13,6 +16,7 @@ ActiveAdmin.register Hero do
 
   form do |f|
     f.inputs do
+	  f.input :lang, :label => 'Language', :as => :select, :collection => LANGUAGES, input_html: { style: "width: 100px; height: 30px"}
       f.input :title
       f.input :description, as: :quill_editor
       f.input :btn_title, label: 'Button Title'

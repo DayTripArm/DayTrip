@@ -7,5 +7,6 @@ class Hero < ApplicationRecord
   validates :btn_title, presence: true
   validates :btn_link, presence: true
   validates :image, presence: true
+  validates :lang, presence: true
 
 end

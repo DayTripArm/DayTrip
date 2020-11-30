@@ -3,6 +3,7 @@ class TipCategory < ApplicationRecord
 
   validates :title, presence: true
   validates :category_type, presence: true
+  validates :lang, presence: true
 
   default_scope -> { order(:id) }
 

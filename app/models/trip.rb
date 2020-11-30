@@ -23,6 +23,7 @@ class Trip < ApplicationRecord
   scope :top_choices, ->  { where(:is_top_choice => true) }
 
   validates :destinations_in_trips, presence: { :message => "must be selected." }
+  validates_presence_of :lang
   validates_presence_of :title
   validates_presence_of :images
   validates_presence_of :trip_duration
