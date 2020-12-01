@@ -11,7 +11,7 @@ class LoginsController < ApplicationController
       if new_user.user_type == 1
         UserNotifierMailer.notify_travelers_prereg(new_user.id).deliver_later(wait: 30.seconds)
       end
-      render json: new_user, status: :ok
+      render json: {email: new_user.email, confirmed_at: new_user.confirmed_at}, status: :ok
     else
       attrs = new_user.errors.messages.keys
       new_user.errors.messages.transform_values!.with_index { |msg, ind| ["#{attrs[ind].capitalize} #{msg[0]}"] }
