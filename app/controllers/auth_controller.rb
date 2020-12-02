@@ -4,16 +4,20 @@ class AuthController < ApplicationController
       confirm_account
     else
       user = Login.joins(:profile).select("logins.*, profiles.name").find_by(email: params[:email])
-      if user.confirmed_at.blank?
-        render json: {user: {}}, status: :ok
-      else
-        if user && user.authenticate(params[:password])
-          render json: payload(user), status: :ok
-        elsif user && !user.authenticate(params[:password])
-          render json: {errors: { password: I18n.t('sign_in.incorrect_password') }}, status: :unauthorized
+      unless user.blank?
+        if user.confirmed_at.blank?
+          render json: {user: {}}, status: :ok
         else
-          render json: {errors: { general: I18n.t('sign_in.incorrect_creds') }}, status: :unauthorized
+          if user.authenticate(params[:password])
+            render json: payload(user), status: :ok
+          elsif !user.authenticate(params[:password])
+            render json: {errors: { password: I18n.t('sign_in.incorrect_password') }}, status: :unauthorized
+          else
+            render json: {errors: { general: I18n.t('sign_in.incorrect_creds') }}, status: :unauthorized
+          end
         end
+      else
+        render json: {errors: { general: I18n.t('sign_in.incorrect_creds') }}, status: :unauthorized
       end
     end
   end
