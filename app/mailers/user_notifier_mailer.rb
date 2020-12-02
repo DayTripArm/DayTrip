@@ -20,10 +20,10 @@ class UserNotifierMailer < ApplicationMailer
     mail(to: @user.email, subject: 'DayTrip Armenia: Account Registration')
   end
 
-  def notify_travelers_prereg(login_id)
-    @user = Profile.user_basic_info(login_id)
-    mail(to: @user.email, subject: 'DayTrip Armenia: Account Verification')
-  end
+  # def notify_travelers_prereg(login_id)
+  #   @user = Profile.user_basic_info(login_id)
+  #   mail(to: @user.email, subject: 'DayTrip Armenia: Account Verification')
+  # end
 
   def notify_profile_approved(login_id)
     @user = Profile.user_basic_info(login_id)
