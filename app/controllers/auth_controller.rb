@@ -6,7 +6,7 @@ class AuthController < ApplicationController
       user = Login.joins(:profile).select("logins.*, profiles.name").find_by(email: params[:email])
       unless user.blank?
         if user.confirmed_at.blank?
-          render json: {user: {}}, status: :ok
+          render json: {user: {email: user.email, confirmed_at: user.confirmed_at}}, status: :ok
         else
           if user.authenticate(params[:password])
             render json: payload(user), status: :ok
