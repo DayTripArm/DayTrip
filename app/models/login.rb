@@ -14,9 +14,9 @@ class Login < ApplicationRecord
   accepts_nested_attributes_for :profile
 
   has_secure_password validations: false
-  validates :email, presence: true, uniqueness: true
-  validates :email, format: { with: URI::MailTo::EMAIL_REGEXP }
-  validates :password, length: { minimum: 6 }
+  validates :email, presence: true, uniqueness: true, if: Proc.new { |user| user.confirmed_at.blank? }
+  validates :email, format: { with: URI::MailTo::EMAIL_REGEXP }, if: Proc.new{ |user| user.confirmed_at.blank? }
+  validates :password, length: { minimum: 6 }, if: Proc.new { |user| user.confirmed_at.blank? }
 
   scope :exclude_fields, ->  { select( Login.attribute_names + Profile.attribute_names - [ 'login_id', 'password_digest', 'created_at', 'updated_at'] ) }
 
