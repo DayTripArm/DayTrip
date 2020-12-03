@@ -26,7 +26,7 @@ class AuthController < ApplicationController
       user = Login.where(confirmation_token: params[:confirmation_token]).first
       unless user.blank?
         if user.confirmed_at.blank?
-          user.confirmed_at = DateTime.current_time
+          user.confirmed_at = DateTime.now
           user.save!
         end
         render json: payload(user), status: :ok
