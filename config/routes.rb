@@ -55,5 +55,8 @@ Rails.application.routes.draw do
      get "/booked_trips", to: "booked_trips#index"
      post "/booked_trips", to: "booked_trips#create"
      get "/booked_trips/:id", to: "booked_trips#booked_trip_details"
+
+     # Resend confirmation email
+     get "/resend_confirmation", to: "auth#resend_confirmation"
    end
 end

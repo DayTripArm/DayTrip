@@ -35,6 +35,14 @@ class AuthController < ApplicationController
       end
   end
 
+  def resend_confirmation
+    user = Login.where(email: params[:email]).first
+    unless user.blank?
+      user.send_confirmation_instructions
+    end
+    render json: {}, status: :ok
+  end
+
   private
 
   def payload(user)
