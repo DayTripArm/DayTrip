@@ -38,13 +38,11 @@ Rails.application.routes.draw do
      get "/trips", to: "trips#index"
      get "/trips/:id", to: "trips#trip_individual"
      get "/trips/:id", to: "trips#trip_details"
-     post "/trips/add_review", to: "trips#add_review"
 
      # Saved trips APIs
      post "/save_trip", to: "trips#save_unsave_trip"
      get "/saved_trips", to: "trips#get_saved_trips"
 
-     post "/driver_reviews", to: "driver_reviews#create"
      get "/price_list", to: "home#price_list"
 
      # Calendar settings
@@ -56,6 +54,8 @@ Rails.application.routes.draw do
      post "/booked_trips", to: "booked_trips#create"
      get "/booked_trips/:id", to: "booked_trips#booked_trip_details"
 
+      post "/trip_review", to: "reviews#trip_review"
+      post "/driver_review", to: "reviews#driver_review"
      # Resend confirmation email
      get "/resend_confirmation", to: "auth#resend_confirmation"
    end

@@ -16,8 +16,8 @@ class TripsController < ApplicationController
             trip: trip,
             is_saved: TripsHelper::is_favourite(trip, params[:login_id]),
             review_stats: {
-                count: TripsHelper::trip_reviews_count(trip),
-                rate:  TripsHelper::trip_reviews_rate(trip)
+                count: TripsHelper::trip_reviews_count(trip.trip_reviews),
+                rate:  TripsHelper::trip_reviews_rate(trip.trip_reviews)
             }
         }
       end
@@ -33,11 +33,11 @@ class TripsController < ApplicationController
         render json: {
             trip: trip,
             destinations: TripsHelper::trip_destinations(trip),
-            reviews: trip.trip_reviews,
+            reviews: TripsHelper::trip_reviews(trip.trip_reviews),
             is_saved: TripsHelper::is_favourite(trip, params[:login_id]),
             review_stats: {
-                count: TripsHelper::trip_reviews_count(trip),
-                rate:  TripsHelper::trip_reviews_rate(trip)
+                count: TripsHelper::trip_reviews_count(trip.trip_reviews),
+                rate:  TripsHelper::trip_reviews_rate(trip.trip_reviews)
             }}, status: :ok
       rescue StandardError => e
         render json: e.message, status: :ok
@@ -77,23 +77,5 @@ class TripsController < ApplicationController
     rescue StandardError, ActiveRecordError => e
       render json: e.message, status: :ok
     end
-  end
-
-  # Create review for trip
-  # GET /add_review
-  def add_review
-    begin
-       trip = Trip.find_by(id: params[:trip_id])
-       new_review = trip.trip_reviews.new(review_params)
-       new_review.save!
-       render json: {message: "Your review has been saved."}, status: :ok
-    rescue StandardError => e
-       render json: e.message, status: :ok
-    end
-  end
-
-  private
-  def review_params
-    params.except(:trip).permit(:login_id, :trip_id, :rate, :review_text)
   end
 end

@@ -32,6 +32,7 @@ class BookedTripsController < ApplicationController
           travelers_trips[index][:trip] = { trip_image: HitTheRoad.active_hit_the_road.blank? ? "": HitTheRoad.active_hit_the_road.image.url, title: 'Hit the Road'}
           unless booked_trip.trip.nil?
             travelers_trips[index][:trip] = { trip_image: booked_trip.trip.images.first.url, title: booked_trip.trip.title}
+            travelers_trips[index][:reviews] = { trip_review: TripsHelper::trip_reviews_rate(booked_trip.trip.trip_reviews), driver_review: TripsHelper::trip_reviews_rate(booked_trip.driver.driver_reviews)}
           end
         end
         render json: {travelers_trips: travelers_trips}, status: :ok
@@ -66,6 +67,7 @@ class BookedTripsController < ApplicationController
     errors = []
     begin
       booked_trip_details = {}
+      booked_trip_details[:reviews] = {}
       booked_trip = BookedTrip.where({id: params[:id]}).first
       unless booked_trip.blank?
         booked_trip_details[:trip_tour] = booked_trip.trip.blank? ? {
@@ -75,7 +77,11 @@ class BookedTripsController < ApplicationController
         } : {
             id: booked_trip.trip.id,
             title: booked_trip.trip.title,
-            image: booked_trip.trip.images.first.url
+            image: booked_trip.trip.images.first.url,
+        }
+        booked_trip_details[:reviews][:trip_review] = {
+            count: TripsHelper::trip_reviews_count(booked_trip.trip.trip_reviews),
+            rate:  TripsHelper::trip_reviews_rate(booked_trip.trip.trip_reviews)
         }
         booked_trip_details[:trip_info] = {
                                             trip_day: booked_trip.trip_day,
@@ -89,6 +95,10 @@ class BookedTripsController < ApplicationController
                                             }
         if params[:utype] == "1"
           user_trip = booked_trip.traveler
+          booked_trip_details[:reviews][:driver_review] = {
+              count: TripsHelper::trip_reviews_count(user_trip.driver_reviews),
+              rate:  TripsHelper::trip_reviews_rate(user_trip.driver_reviews)
+          }
         end
         if params[:utype] == "2"
           user_trip = booked_trip.driver
