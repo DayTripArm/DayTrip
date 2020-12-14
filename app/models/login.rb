@@ -14,7 +14,7 @@ class Login < ApplicationRecord
   accepts_nested_attributes_for :profile
 
   has_secure_password validations: false
-  validates :email, presence: true, uniqueness: true, if: Proc.new { |user| user.confirmed_at.blank? }
+  validates :email, presence: true, uniqueness: {:message => ' is already registered.'}, if: Proc.new { |user| user.confirmed_at.blank? }
   validates :email, format: { with: URI::MailTo::EMAIL_REGEXP }, if: Proc.new{ |user| user.confirmed_at.blank? }
   validates :password, length: { minimum: 6 }, if: Proc.new { |user| user.confirmed_at.blank? }
 
