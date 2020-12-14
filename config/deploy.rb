@@ -1,5 +1,5 @@
 # config valid for current version and patch releases of Capistrano
-lock "~> 3.13.0"
+lock "~> 3.14.1"
 
 set :application, "daytrip"
 set :repo_url, "git@github.com:DayTripArm/DayTrip.git"
@@ -33,7 +33,19 @@ namespace :deploy do
         end
       end
     end
+  end
+
+
+  desc 'Rake import:country_cities'
+  task :run_cities_import do
+    on roles(:app) do
+      within release_path do
+        with rails_env: "#{fetch(:stage)}" do
+          execute :rake, "import:country_cities"
+        end
+      end
     end
+  end
 
 
   desc 'Delete DayTrip UI'
@@ -58,7 +70,7 @@ namespace :deploy do
         with rails_env: "#{fetch(:stage)}" do
           puts "\n******************************Install DayTrip UI***************************************\n"
 
-          execute "cd #{fetch(:daytrip_home_path)} && git clone git@github.com:DayTripArm/DayTripUI.git"
+          execute "cd #{fetch(:daytrip_home_path)} && git clone --branch day_trip_new_design git@github.com:DayTripArm/DayTripUI.git"
           execute "cd #{fetch(:daytrip_home_path)}DayTripUI && npm install && npm run build"
         end
       end
@@ -95,7 +107,7 @@ append :linked_dirs, "log", "tmp/pids", "tmp/cache", "tmp/sockets", "vendor/bund
 # Default value for local_user is ENV['USER']
 # set :local_user, -> { `git config user.name`.chomp }
 
-#set :passenger_restart_with_touch, true
+set :passenger_restart_with_touch, true
 
 # Default value for keep_releases is 5
 set :keep_releases, 5
