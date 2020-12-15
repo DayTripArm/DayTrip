@@ -72,8 +72,16 @@ class TripsController < ApplicationController
   # GET /saved_trips
   def get_saved_trips
     begin
+      save_trip_obj = []
       saved_trips = Trip.active_trips.joins(:saved_trips).where("saved_trips.login_id = ?", params[:login_id])
-      render json: saved_trips, status: :ok
+      saved_trips.each_with_index do |trip, index|
+        save_trip_obj[index] = JSON.parse(trip.to_json)
+        save_trip_obj[index][:review_stats] = {
+            count: TripsHelper::trip_reviews_count(trip.trip_reviews),
+            rate:  TripsHelper::trip_reviews_rate(trip.trip_reviews)
+        }
+      end
+      render json: save_trip_obj, status: :ok
     rescue StandardError, ActiveRecordError => e
       render json: e.message, status: :ok
     end

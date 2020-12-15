@@ -32,8 +32,17 @@ class BookedTripsController < ApplicationController
           travelers_trips[index][:trip] = { trip_image: HitTheRoad.active_hit_the_road.blank? ? "": HitTheRoad.active_hit_the_road.image.url, title: 'Hit the Road'}
           unless booked_trip.trip.nil?
             travelers_trips[index][:trip] = { trip_image: booked_trip.trip.images.first.url, title: booked_trip.trip.title}
-            travelers_trips[index][:reviews] = { trip_review: TripsHelper::trip_reviews_rate(booked_trip.trip.trip_reviews), driver_review: TripsHelper::trip_reviews_rate(booked_trip.driver.driver_reviews)}
           end
+          travelers_trips[index][:reviews] = {
+              trip_review: {
+                  rate: booked_trip.trip_review.blank? ? "": booked_trip.trip_review.rate.to_f.to_s,
+                  notes: booked_trip.trip_review.blank? ? "": booked_trip.trip_review.review_text
+              },
+              driver_review: {
+                  rate: booked_trip.driver_review.blank? ? "": booked_trip.driver_review.rate.to_f.to_s,
+                  notes: booked_trip.driver_review.blank? ? "": booked_trip.driver_review.review_text
+              }
+          }
         end
         render json: {travelers_trips: travelers_trips}, status: :ok
       else

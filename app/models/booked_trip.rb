@@ -5,6 +5,8 @@ class BookedTrip < ApplicationRecord
   belongs_to :profile, optional: true
   belongs_to :photos, optional: true
   belongs_to :trip, optional: true, :foreign_key => "trip_id"
+  has_one :driver_review, foreign_key: :booked_trip_id
+  has_one :trip_review, foreign_key: :booked_trip_id
 
   scope :travelers_info, -> (login_id) { where(traveler_id: login_id) }
 end
