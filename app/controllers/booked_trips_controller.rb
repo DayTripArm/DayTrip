@@ -104,13 +104,13 @@ class BookedTripsController < ApplicationController
                                             }
         if params[:utype] == "1"
           user_trip = booked_trip.traveler
+        end
+        if params[:utype] == "2"
+          user_trip = booked_trip.driver
           booked_trip_details[:reviews][:driver_review] = {
               count: TripsHelper::trip_reviews_count(user_trip.driver_reviews),
               rate:  TripsHelper::trip_reviews_rate(user_trip.driver_reviews)
           }
-        end
-        if params[:utype] == "2"
-          user_trip = booked_trip.driver
         end
         user_photo = user_trip.blank? ? [] : user_trip.photos.get_by_file_type(1).first
         profile_photo = user_photo.blank? ? File.join("/uploads","profile_photos","blank-profile.png") :  PhotosHelper::get_photo_full_path(user_photo.name, Photo::FILE_TYPES.key(user_photo.file_type), user_photo[:login_id].to_s)
@@ -121,6 +121,7 @@ class BookedTripsController < ApplicationController
             languages: user_trip.profile.languages,
             phone: user_trip.profile.phone,
             about: user_trip.profile.about,
+            user_type: user_trip.profile.login.user_type,
             created_at: user_trip.profile.login.created_at
         }
         booked_trip_details[:user_info] = user_info

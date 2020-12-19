@@ -17,7 +17,8 @@ module TripsHelper
     reviews.each do |review|
       profile_photo = review.login.photos.where(file_type: 1).first
       unless profile_photo.blank?
-        reviewer_img = PhotosHelper::get_photo_full_path(profile_photo.name,  Photo::FILE_TYPES.key(profile_photo.file_type), review.logins_id.to_s)
+        reviewer_img = PhotosHelper::get_photo_full_path(profile_photo.name,  Photo::FILE_TYPES.key(profile_photo.file_type), (review.has_attribute?(:traveler_id)? review.traveler_id: review.login_id).to_s)
+        reviewer_img = File.join("/uploads","profile_photos","blank-profile.png") unless File.exists?(reviewer_img)
       else
         reviewer_img = File.join("/uploads","profile_photos","blank-profile.png")
       end

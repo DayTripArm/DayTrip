@@ -54,6 +54,10 @@ class HomeController < ApplicationController
         end
         drivers_list[index]["car_specs"] = JSON.parse(drivers_list[index]["car_specs"])
         drivers_list[index][:car_full_name] = CarHelper::format_car_model(driver[:car_mark].to_i, driver[:car_model].to_i)
+        drivers_list[index][:review] = {
+            count: TripsHelper::trip_reviews_count(driver.driver_reviews),
+            rate:  TripsHelper::trip_reviews_rate(driver.driver_reviews)
+        }
       end
 
       render json: {trip_details: trip_details, drivers_list: drivers_list, driversTotalCount: totalCount}, status: :ok
