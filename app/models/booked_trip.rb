@@ -9,4 +9,6 @@ class BookedTrip < ApplicationRecord
   has_one :trip_review, foreign_key: :booked_trip_id
 
   scope :travelers_info, -> (login_id) { where(traveler_id: login_id) }
+  scope :upcoming_trips, -> (driver_id) { where("driver_id =? AND trip_day >=?", driver_id, Date.current) }
+  scope :completed_trips, -> (driver_id) { where("driver_id =? AND trip_day <?", driver_id, Date.current) }
 end

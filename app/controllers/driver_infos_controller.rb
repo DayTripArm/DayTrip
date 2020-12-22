@@ -111,6 +111,29 @@ class DriverInfosController < ApplicationController
     end
   end
 
+  def driver_progress
+    errors = []
+    begin
+      driver_reviews = DriverReview.where({driver_id: params[:id]})
+      overall_rating = driver_reviews.blank? ? 0: TripsHelper::trip_reviews_rate(driver_reviews)
+      reviews_and_bookings = DriverReview.where({driver_id: params[:id]}).count()
+      completed_trips = BookedTrip.completed_trips(params[:id]).count()
+      destinations_booked = TripsHelper::booked_destinations_count(BookedTrip.where({driver_id: params[:id]}));
+      upcoming_trips = BookedTrip.upcoming_trips(params[:id]).count()
+      render json: {
+          current_month_earnings: 0,
+          overall_rating: overall_rating,
+          reviews_and_bookings: reviews_and_bookings,
+          completed_trips: completed_trips,
+          destinations_booked: destinations_booked,
+          upcoming_trips: upcoming_trips,
+      }, status: :ok
+    rescue StandardError=> e
+      errors << e.message unless e.message.blank?
+      render json: errors, status: :internal_server_error
+    end
+  end
+
   # Permit request params
   def driver_info_params
     params.require(:driver_info).permit(:car_type, :car_mark, :car_model, :car_year, :car_color, :car_seats, :car_specs, :driver_destinations, :tariff1, :tariff2, :hit_the_road_tariff)
