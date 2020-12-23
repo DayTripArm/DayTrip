@@ -13,6 +13,7 @@ class HomeController < ApplicationController
     errors = []
     begin
       drivers_list = []
+      trip_details = {}
       drivers = Login.joins(:profile, :driver_info, :photos)
                     .select("logins.id, logins.user_type, profiles.name AS driver_name, profiles.languages, driver_infos.car_seats, driver_infos.car_specs,
                             driver_infos.hit_the_road_tariff, driver_infos.tariff1, driver_infos.tariff1, driver_infos.tariff2,
@@ -29,11 +30,16 @@ class HomeController < ApplicationController
       end
       params[:price_range] = params[:price_range].split(',')
       unless params[:trip_id].to_i.zero?
-        trip_details = Trip.select('id, images, title, trip_duration, start_location').where(id: params[:trip_id]).first
+        trip = Trip.select('id, images, title, trip_duration, start_location').where(id: params[:trip_id]).first
         min = params[:price_range].blank? ? 10: params[:price_range][0]
         max = params[:price_range].blank? ? 100000: params[:price_range][1]
         drivers = drivers.where("(tariff1 >= :min and tariff1 <= :max) or (tariff2 >= :min and tariff2 <= :max)",
                                 min: min, max: max)
+        trip_details = JSON.parse(trip.to_json)
+        trip_details[:trip_review] = {
+            count: TripsHelper::trip_reviews_count(trip.trip_reviews),
+            rate:  TripsHelper::trip_reviews_rate(trip.trip_reviews)
+        }
       else
         trip_details = HitTheRoad.active_hit_the_road
         drivers = drivers.where("driver_infos.hit_the_road_tariff IS NOT null AND hit_the_road_tariff >= (?) AND hit_the_road_tariff <= (?)",
