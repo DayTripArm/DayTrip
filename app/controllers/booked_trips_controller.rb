@@ -122,6 +122,7 @@ class BookedTripsController < ApplicationController
             phone: user_trip.profile.phone,
             about: user_trip.profile.about,
             user_type: user_trip.profile.login.user_type,
+            user_id: user_trip.profile.login.id,
             created_at: user_trip.profile.login.created_at
         }
         booked_trip_details[:user_info] = user_info
