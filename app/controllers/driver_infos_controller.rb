@@ -115,19 +115,104 @@ class DriverInfosController < ApplicationController
     errors = []
     begin
       driver_reviews = DriverReview.where({driver_id: params[:id]})
+      current_month_earnings = BookedTrip.where({driver_id: params[:id]}).current_month_bookings.sum(:price)
       overall_rating = driver_reviews.blank? ? 0: TripsHelper::trip_reviews_rate(driver_reviews)
-      reviews_and_bookings = DriverReview.where({driver_id: params[:id]}).count()
+      bookings = BookedTrip.where({driver_id: params[:id]}).count()
       completed_trips = BookedTrip.completed_trips(params[:id]).count()
-      destinations_booked = TripsHelper::booked_destinations_count(BookedTrip.where({driver_id: params[:id]}));
+      popular_trips = BookedTrip.popular_trips(params[:id]).booked_count
       upcoming_trips = BookedTrip.upcoming_trips(params[:id]).count()
       render json: {
-          current_month_earnings: 0,
+          current_month_earnings: current_month_earnings || 0,
           overall_rating: overall_rating,
-          reviews_and_bookings: reviews_and_bookings,
+          bookings: bookings,
           completed_trips: completed_trips,
-          destinations_booked: destinations_booked,
+          popular_trips: popular_trips,
           upcoming_trips: upcoming_trips,
       }, status: :ok
+    rescue StandardError=> e
+      errors << e.message unless e.message.blank?
+      render json: errors, status: :internal_server_error
+    end
+  end
+
+  def view_driver_progress
+    errors = []
+    progress_details = {}
+    begin
+      case params[:section_type].to_i
+        when 1
+          progress_details[:current_month_earnings] = BookedTrip.select("TO_CHAR(date_trunc('month', series_date), 'Month YYYY') as month,
+                                                          sum(
+                                                            COALESCE(booked_trips.price, 0)
+                                                          ) AS earnings")
+                                                          .from("generate_series(
+                                                             '2020-11-01'::timestamp,
+                                                             '2021-02-01'::timestamp,
+                                                             '1 day'
+                                                           ) AS series_date")
+                                                          .joins("LEFT JOIN booked_trips ON booked_trips.trip_day::date = series_date")
+                                                          .group("month")
+                                                          .order("month")
+      when 2
+          driver_reviews = DriverReview.where({driver_id: params[:id]})
+          progress_details[:overall_rating] = {
+              rate: TripsHelper::trip_reviews_rate(driver_reviews),
+              reviews_list: TripsHelper::trip_reviews(driver_reviews)
+          }
+      when 4
+          progress_details[:completed_trips] = BookedTrip.completed_trips(params[:id])
+                                                   .select("TO_CHAR(date_trunc('month', series_date), 'Month YYYY') as month,
+                                                          count(
+                                                            COALESCE(booked_trips.id, 0)
+                                                          ) AS trips_count")
+                                                   .from("generate_series(
+                                                     '2020-11-01'::timestamp,
+                                                     '2021-02-01'::timestamp,
+                                                     '1 day'
+                                                   ) AS series_date")
+                                                   .joins("LEFT JOIN booked_trips ON booked_trips.trip_day::date = series_date")
+                                                   .group("month")
+                                                   .order("month")
+     when 5
+          popular_trip = BookedTrip.popular_trips(params[:id])
+          progress_details[:popular_trip] = {
+              popularity_score: popular_trip.booked_count,
+              trip_details: popular_trip.trip.blank? ? {
+                  id: HitTheRoad.active_hit_the_road.blank? ? nil: HitTheRoad.active_hit_the_road.id,
+                  title: 'Hit the Road',
+                  image: HitTheRoad.active_hit_the_road.blank? ? "": HitTheRoad.active_hit_the_road.image.url,
+                  trip_reviews: {
+                      count: TripsHelper::trip_reviews_count(popular_trip.trip.trip_reviews),
+                      rate:  TripsHelper::trip_reviews_rate(popular_trip.trip.trip_reviews)
+                  }
+              } : {
+                  id: popular_trip.trip.id,
+                  title: popular_trip.trip.title,
+                  image: popular_trip.trip.images.first.url,
+                  trip_reviews: {
+                      count: TripsHelper::trip_reviews_count(popular_trip.trip.trip_reviews),
+                      rate:  TripsHelper::trip_reviews_rate(popular_trip.trip.trip_reviews)
+                  }
+              }
+
+          }
+        when 6
+          progress_details[:upcoming_trips] = BookedTrip.upcoming_trips(params[:id])
+                                            .select("date_trunc('month', series_date) as month,
+                                                    count(
+                                                      COALESCE(booked_trips.id, 0)
+                                                    ) AS trips_count")
+                                            .from("generate_series(
+                                               '2020-11-01'::timestamp,
+                                               '2021-02-01'::timestamp,
+                                               '1 day'
+                                             ) AS series_date")
+                                             .joins("LEFT JOIN booked_trips ON booked_trips.trip_day::date = series_date")
+                                            .group("month")
+                                            .order("month")
+      end
+
+      render json: progress_details, status: :ok
     rescue StandardError=> e
       errors << e.message unless e.message.blank?
       render json: errors, status: :internal_server_error

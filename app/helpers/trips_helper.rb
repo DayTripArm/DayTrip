@@ -44,10 +44,4 @@ module TripsHelper
     end
     dests
   end
-
-  def self.booked_destinations_count(booked_trips)
-    dests = []
-    booked_trips.each{ |booked_trip, index| dests << booked_trip.trip.destinations_in_trips}
-    dests.count()
-  end
 end
