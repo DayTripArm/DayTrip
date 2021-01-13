@@ -12,6 +12,7 @@ class DriverInfosController < ApplicationController
         profile = Profile.find_by(login_id: params[:login_id])
         driver_info.assign_attributes(driver_info_params.merge({login_id: params[:login_id]}))
         profile.assign_attributes(profile_info_params)
+        profile.status = Profile::STATUS_REG
         driver_info.save!
         profile.save!
         Photo::FILE_TYPES.each do |type, type_int|

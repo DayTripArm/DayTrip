@@ -5,7 +5,8 @@ en:
     incorrect_password: 'Incorrect Password'
   profiles:
     statuses:
-      preregistration: "Registrated"
+      preregistrated: "Pre Registrated"
+      registered: "Registrated"
       suspended: "Onhold"
       active: "Active"
       deactivated: "Deactivated"

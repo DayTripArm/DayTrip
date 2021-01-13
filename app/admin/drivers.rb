@@ -1,6 +1,6 @@
 ActiveAdmin.register Profile, as: "Drivers" do
 
-  scope "All", :drivers_all, default: true
+  scope "All", :drivers_all_registered, default: true
   scope "Approved", :drivers_approved
   scope "Suspended", :drivers_suspended
   scope "Pending Approval", :drivers_pending
@@ -11,7 +11,7 @@ ActiveAdmin.register Profile, as: "Drivers" do
     column :phone
     column :status do |resource|
       case resource.status
-      when Profile::STATUS_PREREG
+      when Profile::STATUS_REG
         status_tag "Pending Approval", class: 'orange'
       when Profile::STATUS_SUSPENDED
         status_tag "Suspended", class: 'grey'

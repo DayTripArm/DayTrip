@@ -27,6 +27,7 @@ class AuthController < ApplicationController
       unless user.blank?
         if user.confirmed_at.blank?
           user.confirmed_at = DateTime.now
+          user.profile.status = Profile::STATUS_REG if user.user_type == 1
           user.save!
         end
         render json: payload(user), status: :ok
