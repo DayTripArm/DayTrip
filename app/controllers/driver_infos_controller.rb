@@ -120,14 +120,14 @@ class DriverInfosController < ApplicationController
       overall_rating = driver_reviews.blank? ? 0: TripsHelper::trip_reviews_rate(driver_reviews)
       bookings = BookedTrip.where({driver_id: params[:id]}).count()
       completed_trips = BookedTrip.completed_trips(params[:id]).last_month_bookings.count()
-      popular_trips = BookedTrip.popular_trips(params[:id]).booked_count
+      popular_trips_count = BookedTrip.where({driver_id: params[:id]}).group(:trip_id).count(:id)
       upcoming_trips = BookedTrip.upcoming_trips(params[:id]).count()
       render json: {
           current_month_earnings: current_month_earnings || 0,
           overall_rating: overall_rating,
           bookings: bookings,
           completed_trips: completed_trips,
-          popular_trips: popular_trips,
+          popular_trips: popular_trips_count.count,
           upcoming_trips: upcoming_trips,
       }, status: :ok
     rescue StandardError=> e
@@ -189,28 +189,35 @@ class DriverInfosController < ApplicationController
                                                    .group("full_date, month")
                                                    .order("full_date desc")
      when 5
-          popular_trip = BookedTrip.popular_trips(params[:id])
-          progress_details[:popular_trip] = {
-              popularity_score: popular_trip.booked_count,
-              trip_details: popular_trip.trip.blank? ? {
-                  id: HitTheRoad.active_hit_the_road.blank? ? nil: HitTheRoad.active_hit_the_road.id,
-                  title: 'Hit the Road',
-                  image: HitTheRoad.active_hit_the_road.blank? ? "": HitTheRoad.active_hit_the_road.image.url,
-                  trip_reviews: {
-                      count: TripsHelper::trip_reviews_count(popular_trip.trip.trip_reviews),
-                      rate:  TripsHelper::trip_reviews_rate(popular_trip.trip.trip_reviews)
+          popular_trips = BookedTrip.popular_trips(params[:id])
+          if popular_trips.blank?
+            progress_details[:popular_trips] = []
+          else
+            progress_details[:popular_trips] = []
+            popular_trips.each do |popular_trip|
+              progress_details[:popular_trips] << {
+                  popularity_score: popular_trip.booked_count,
+                  trip_details: popular_trip.trip.blank? ? {
+                      id: HitTheRoad.active_hit_the_road.blank? ? nil: HitTheRoad.active_hit_the_road.id,
+                      title: 'Hit the Road',
+                      image: HitTheRoad.active_hit_the_road.blank? ? nil: HitTheRoad.active_hit_the_road.image.url,
+                      trip_review: {
+                          count: 0,
+                          rate:  nil
+                      }
+                  } : {
+                      id: popular_trip.trip.id,
+                      title: popular_trip.trip.title,
+                      image: popular_trip.trip.images.first.url,
+                      trip_review: {
+                          count: TripsHelper::trip_reviews_count(popular_trip.trip.trip_reviews),
+                          rate:  TripsHelper::trip_reviews_rate(popular_trip.trip.trip_reviews)
+                      }
                   }
-              } : {
-                  id: popular_trip.trip.id,
-                  title: popular_trip.trip.title,
-                  image: popular_trip.trip.images.first.url,
-                  trip_reviews: {
-                      count: TripsHelper::trip_reviews_count(popular_trip.trip.trip_reviews),
-                      rate:  TripsHelper::trip_reviews_rate(popular_trip.trip.trip_reviews)
-                  }
-              }
 
-          }
+              }
+            end
+          end
         when 6
           progress_details[:upcoming_trips] = BookedTrip
                                             .select("date_trunc('month', series_date) as full_date,
