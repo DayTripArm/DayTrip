@@ -119,7 +119,7 @@ class DriverInfosController < ApplicationController
       current_month_earnings = BookedTrip.where({driver_id: params[:id]}).current_month_bookings.sum(:price)
       overall_rating = driver_reviews.blank? ? 0: TripsHelper::trip_reviews_rate(driver_reviews)
       bookings = BookedTrip.where({driver_id: params[:id]}).count()
-      completed_trips = BookedTrip.completed_trips(params[:id]).count()
+      completed_trips = BookedTrip.completed_trips(params[:id]).last_month_bookings.count()
       popular_trips = BookedTrip.popular_trips(params[:id]).booked_count
       upcoming_trips = BookedTrip.upcoming_trips(params[:id]).count()
       render json: {
@@ -140,40 +140,54 @@ class DriverInfosController < ApplicationController
     errors = []
     progress_details = {}
     begin
+      member_since = Login.where(id: params[:id]).first.created_at.to_date
       case params[:section_type].to_i
         when 1
-          progress_details[:current_month_earnings] = BookedTrip.select("TO_CHAR(date_trunc('month', series_date), 'Month YYYY') as month,
+          progress_details[:monthly_earnings] = BookedTrip.select("date_trunc('month', series_date) as full_date,
+                                                          TO_CHAR(date_trunc('month', series_date), 'Month YYYY') as month,
                                                           sum(
                                                             COALESCE(booked_trips.price, 0)
-                                                          ) AS earnings")
+                                                          ) AS mountly_result")
                                                           .from("generate_series(
-                                                             '2020-11-01'::timestamp,
-                                                             '2021-02-01'::timestamp,
+                                                             '#{member_since}'::timestamp,
+                                                             '#{Date.current}'::timestamp,
                                                              '1 day'
                                                            ) AS series_date")
-                                                          .joins("LEFT JOIN booked_trips ON booked_trips.trip_day::date = series_date")
-                                                          .group("month")
-                                                          .order("month")
+                                                          .joins("LEFT JOIN booked_trips ON booked_trips.trip_day::date = series_date AND driver_id = #{params[:id]}")
+                                                          .group("full_date, month")
+                                                          .order("full_date desc")
       when 2
-          driver_reviews = DriverReview.where({driver_id: params[:id]})
+          driver_reviews = DriverReview.select("driver_reviews.*,
+                                               date_trunc('month', series_date) as full_date,
+                                               TO_CHAR(date_trunc('month', series_date), 'Month YYYY') as month")
+                                       .from("generate_series(
+                                               '#{member_since}'::timestamp,
+                                               '#{Date.current}'::timestamp,
+                                               '1 day'
+                                             ) AS series_date")
+                                       .joins("RIGHT JOIN driver_reviews ON driver_reviews.created_at::date = series_date AND driver_id = #{params[:id]}")
+                                       .group("full_date, month, driver_reviews.id")
+                                       .order("full_date desc")
           progress_details[:overall_rating] = {
-              rate: TripsHelper::trip_reviews_rate(driver_reviews),
-              reviews_list: TripsHelper::trip_reviews(driver_reviews)
+              rate: driver_reviews.blank? ? "0.0": driver_reviews.sum { |x| x["rate"] }.to_f / driver_reviews.size,
+              reviews: driver_reviews_list(driver_reviews)
           }
       when 4
-          progress_details[:completed_trips] = BookedTrip.completed_trips(params[:id])
-                                                   .select("TO_CHAR(date_trunc('month', series_date), 'Month YYYY') as month,
+          progress_details[:completed_trips] = BookedTrip
+                                                   .select("date_trunc('month', series_date) as full_date,
+                                                          TO_CHAR(date_trunc('month', series_date), 'Month YYYY') as month,
                                                           count(
-                                                            COALESCE(booked_trips.id, 0)
-                                                          ) AS trips_count")
+                                                            COALESCE(booked_trips.id, NULL)
+                                                          ) AS mountly_result")
                                                    .from("generate_series(
-                                                     '2020-11-01'::timestamp,
-                                                     '2021-02-01'::timestamp,
+                                                     '#{member_since}'::timestamp,
+                                                     '#{Date.current}'::timestamp,
                                                      '1 day'
                                                    ) AS series_date")
-                                                   .joins("LEFT JOIN booked_trips ON booked_trips.trip_day::date = series_date")
-                                                   .group("month")
-                                                   .order("month")
+                                                   .joins("LEFT JOIN booked_trips ON booked_trips.trip_day::date = series_date
+                                                          AND driver_id = #{params[:id]} AND trip_day < '#{Date.current}'")
+                                                   .group("full_date, month")
+                                                   .order("full_date desc")
      when 5
           popular_trip = BookedTrip.popular_trips(params[:id])
           progress_details[:popular_trip] = {
@@ -198,19 +212,21 @@ class DriverInfosController < ApplicationController
 
           }
         when 6
-          progress_details[:upcoming_trips] = BookedTrip.upcoming_trips(params[:id])
-                                            .select("date_trunc('month', series_date) as month,
+          progress_details[:upcoming_trips] = BookedTrip
+                                            .select("date_trunc('month', series_date) as full_date,
+                                                    TO_CHAR(date_trunc('month', series_date), 'Month YYYY') as month,
                                                     count(
-                                                      COALESCE(booked_trips.id, 0)
-                                                    ) AS trips_count")
+                                                      COALESCE(booked_trips.id, NULL)
+                                                    ) AS mountly_result")
                                             .from("generate_series(
-                                               '2020-11-01'::timestamp,
-                                               '2021-02-01'::timestamp,
+                                               '#{Date.current}'::timestamp,
+                                               '#{Date.current + 12.month}'::timestamp,
                                                '1 day'
                                              ) AS series_date")
-                                             .joins("LEFT JOIN booked_trips ON booked_trips.trip_day::date = series_date")
-                                            .group("month")
-                                            .order("month")
+                                            .joins("LEFT JOIN booked_trips ON booked_trips.trip_day::date = series_date
+                                                   AND driver_id = #{params[:id]} AND trip_day >= '#{Date.current}'")
+                                            .group("full_date, month")
+                                            .order("full_date asc")
       end
 
       render json: progress_details, status: :ok
@@ -249,5 +265,27 @@ class DriverInfosController < ApplicationController
   def set_user_status profile
     profile = Profile.find_by({login_id: params[:login_id]}) if profile.nil?
     profile.update({status: Profile::STATUS_SUSPENDED})
+  end
+
+  def driver_reviews_list(reviews)
+    driver_reviews = {}
+    reviews.each do |review|
+      driver_reviews["#{review.month}"] = [] if driver_reviews["#{review.month}"].blank?
+      profile_photo = review.login.photos.where(file_type: 1).first
+      unless profile_photo.blank?
+        reviewer_img = PhotosHelper::get_photo_full_path(profile_photo.name,  Photo::FILE_TYPES.key(profile_photo.file_type), (review.has_attribute?(:traveler_id)? review.traveler_id: review.login_id).to_s)
+        reviewer_img = File.join("/uploads","profile_photos","blank-profile.png") unless File.exists?(reviewer_img)
+      else
+        reviewer_img = File.join("/uploads","profile_photos","blank-profile.png")
+      end
+      driver_reviews["#{review.month}"] << {
+          review_text: review.review_text,
+          reviewer_name: review.login.profile.name,
+          rate: number_with_precision(review.rate, :precision => 1),
+          reviewer_img: reviewer_img,
+          created_at: review.created_at
+      }
+    end
+    driver_reviews
   end
 end

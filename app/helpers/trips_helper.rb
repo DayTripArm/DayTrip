@@ -25,6 +25,7 @@ module TripsHelper
       trip_review << {
           review_text: review.review_text,
           reviewer_name: review.login.profile.name,
+          rate: number_with_precision(review.rate, :precision => 1),
           reviewer_img: reviewer_img,
           created_at: review.created_at
       }

@@ -13,4 +13,5 @@ class BookedTrip < ApplicationRecord
   scope :completed_trips, -> (driver_id) { where("driver_id =? AND trip_day <?", driver_id, Date.current) }
   scope :popular_trips, -> (driver_id) { where({driver_id: driver_id}).group(:trip_id).order('count(id) DESC').select("count(*) as booked_count, trip_id").first }
   scope :current_month_bookings, -> () { where("trip_day > ? AND trip_day < ?", Time.now.beginning_of_month, Time.now.end_of_month) }
+  scope :last_month_bookings, -> () { where("trip_day > ? AND trip_day < ?", Time.now.beginning_of_month - 1.month, Time.now.end_of_month - 1.month) }
 end
