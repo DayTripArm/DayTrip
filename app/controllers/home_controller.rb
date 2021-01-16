@@ -42,8 +42,9 @@ class HomeController < ApplicationController
         }
       else
         trip_details = HitTheRoad.active_hit_the_road
-        drivers = drivers.where("driver_infos.hit_the_road_tariff IS NOT null AND hit_the_road_tariff >= (?) AND hit_the_road_tariff <= (?)",
-                                params[:price_range]? params[:price_range][0]: 10, params[:price_range]? params[:price_range][1]: 100000).distinct
+        drivers = drivers.where("driver_infos.hit_the_road_tariff IS NOT null AND hit_the_road_tariff >= ? AND hit_the_road_tariff <= ?",
+                                params[:price_range].blank? ? 10: params[:price_range][0],
+                                params[:price_range].blank? ? 100000: params[:price_range][1].to_i < 1000 ? params[:price_range][1]: 100000).distinct
       end
       totalCount = drivers.size
       drivers = drivers.limit(params[:limit] || 5).offset(params[:offset] || 0)
