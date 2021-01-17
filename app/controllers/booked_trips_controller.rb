@@ -57,7 +57,7 @@ class BookedTripsController < ApplicationController
   def create
     errors = []
     begin
-      booked_trip = BookedTrip.where({driver_id: params[:user_id], traveler_id: params[:traveler_id], trip_day: params[:day]})
+      booked_trip = BookedTrip.where({driver_id: params[:driver_id], traveler_id: params[:traveler_id], trip_day: params[:trip_day]})
       if booked_trip.blank?
         new_booked_trip = BookedTrip.new(booked_trips_params)
         new_booked_trip.save
@@ -140,6 +140,6 @@ class BookedTripsController < ApplicationController
 
   private
   def booked_trips_params
-    params.except(:booked_trip).permit(:driver_id, :traveler_id, :trip_id, :trip_day, :travelers_count, :pickup_location, :pickup_time, :price, :notes)
+    params.except(:booked_trip, :user_type, :trip_title).permit(:driver_id, :traveler_id, :trip_id, :trip_day, :travelers_count, :pickup_location, :pickup_time, :price, :notes)
   end
 end

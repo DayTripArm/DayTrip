@@ -31,8 +31,8 @@ class HomeController < ApplicationController
       params[:price_range] = params[:price_range].split(',')
       unless params[:trip_id].to_i.zero?
         trip = Trip.select('id, images, title, trip_duration, start_location').where(id: params[:trip_id]).first
-        min = params[:price_range].blank? ? 10: params[:price_range][0]
-        max = params[:price_range].blank? ? 100000: params[:price_range][1]
+        min = params[:price_range].blank? ? 10: params[:price_range][0].to_i
+        max = params[:price_range].blank? ? 1000: params[:price_range][1].to_i
         drivers = drivers.where("(tariff1 >= :min and tariff1 <= :max) or (tariff2 >= :min and tariff2 <= :max)",
                                 min: min, max: max)
         trip_details = JSON.parse(trip.to_json)
@@ -43,8 +43,8 @@ class HomeController < ApplicationController
       else
         trip_details = HitTheRoad.active_hit_the_road
         drivers = drivers.where("driver_infos.hit_the_road_tariff IS NOT null AND hit_the_road_tariff >= ? AND hit_the_road_tariff <= ?",
-                                params[:price_range].blank? ? 10: params[:price_range][0],
-                                params[:price_range].blank? ? 100000: params[:price_range][1].to_i < 1000 ? params[:price_range][1]: 100000).distinct
+                                params[:price_range].blank? ? 25000: params[:price_range][0].to_i,
+                                params[:price_range].blank? ? 85000: params[:price_range][1].to_i).distinct
       end
       totalCount = drivers.size
       drivers = drivers.limit(params[:limit] || 5).offset(params[:offset] || 0)
