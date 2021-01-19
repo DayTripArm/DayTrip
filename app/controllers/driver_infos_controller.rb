@@ -150,11 +150,14 @@ class DriverInfosController < ApplicationController
                                                           ) AS mountly_result")
                                                           .from("generate_series(
                                                              '#{member_since}'::timestamp,
-                                                             '#{Date.current}'::timestamp,
+                                                             '#{member_since + 6.month}'::timestamp,
                                                              '1 day'
                                                            ) AS series_date")
                                                           .joins("LEFT JOIN booked_trips ON booked_trips.trip_day::date = series_date AND driver_id = #{params[:id]}")
-                                                          .group("full_date, month")
+                                                          .group("full_date")
+                                                          .having("sum(
+                                                            COALESCE(booked_trips.price, 0)
+                                                          )<>0")
                                                           .order("full_date desc")
       when 2
           driver_reviews = DriverReview.select("driver_reviews.*,
@@ -187,6 +190,9 @@ class DriverInfosController < ApplicationController
                                                    .joins("LEFT JOIN booked_trips ON booked_trips.trip_day::date = series_date
                                                           AND driver_id = #{params[:id]} AND trip_day < '#{Date.current}'")
                                                    .group("full_date, month")
+                                                   .having("COUNT(
+                                                      COALESCE(booked_trips.id, NULL)
+                                                   )<>0")
                                                    .order("full_date desc")
      when 5
           popular_trips = BookedTrip.popular_trips(params[:id])
@@ -233,6 +239,9 @@ class DriverInfosController < ApplicationController
                                             .joins("LEFT JOIN booked_trips ON booked_trips.trip_day::date = series_date
                                                    AND driver_id = #{params[:id]} AND trip_day >= '#{Date.current}'")
                                             .group("full_date, month")
+                                            .having("COUNT(
+                                                COALESCE(booked_trips.id, NULL)
+                                             )<>0")
                                             .order("full_date asc")
       end
 
