@@ -60,5 +60,11 @@ Rails.application.routes.draw do
       post "/driver_review", to: "reviews#driver_review"
      # Resend confirmation email
      get "/resend_confirmation", to: "auth#resend_confirmation"
+      # Messages
+      get "conversations", to: "conversations#index"
+      post "conversations", to: "conversations#create"
+
+      get "messages/:conversation_id", to: "messages#index"
+      post "messages/:conversation_id", to: "messages#create"
    end
 end
