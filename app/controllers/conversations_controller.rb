@@ -1,7 +1,7 @@
 class ConversationsController < ApplicationController
   # before_action :authenticate_user
   def index
-    @conversations = Conversation.select("conversations.id as conversation_id, booked_trips.*").joins(:booked_trip)
+    @conversations = Conversation.select("conversations.id as conversation_id, conversations.sender_id, conversations.recipient_id, booked_trips.*").joins(:booked_trip)
                          .where("sender_id = ? or recipient_id= ?",  params[:user_id], params[:user_id])
 
     render json: {conversations: @conversations}, status: :ok
