@@ -1,10 +1,12 @@
 class ConversationsController < ApplicationController
   # before_action :authenticate_user
   def index
-    @conversations = Conversation.select("conversations.id as conversation_id, conversations.sender_id, conversations.recipient_id, booked_trips.*").joins(:booked_trip)
+    @conversations = Conversation.select("conversations.id as conversation_id, conversations.sender_id, conversations.recipient_id,
+                                          booked_trips.pickup_location, booked_trips.pickup_time, booked_trips.trip_day, trips.title")
+                         .joins(:booked_trip =>[:trip])
                          .where("sender_id = ? or recipient_id= ?",  params[:user_id], params[:user_id])
-
-    render json: {conversations: @conversations}, status: :ok
+    conversations_list = JSON.parse(@conversations.to_json)
+    render json: {conversations_list: conversations_list}, status: :ok
   end
   def create
     if Conversation.between(params[:sender_id],params[:recipient_id], params[:booked_trip_id])
