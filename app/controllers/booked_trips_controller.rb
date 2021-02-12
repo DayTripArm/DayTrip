@@ -93,6 +93,7 @@ class BookedTripsController < ApplicationController
             rate:  TripsHelper::trip_reviews_rate(booked_trip.trip.trip_reviews)
         }
         booked_trip_details[:trip_info] = {
+                                            booked_id: booked_trip.id,
                                             trip_day: booked_trip.trip_day,
                                             travelers_count: booked_trip.travelers_count,
                                             trip_duration: booked_trip.trip.blank? ? 12 : booked_trip.trip.trip_duration
