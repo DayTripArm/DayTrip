@@ -1,10 +1,10 @@
 class Message < ActiveRecord::Base
   belongs_to :conversation
   belongs_to :login
-  validates_presence_of :body, :conversation_id, :user_id
+  validates_presence_of :body, :conversation_id, :login_id
 
 
   def message_time
-    created_at.strftime("%m/%d/%y at %l:%M %p")
+    created_at.strftime("%FT%T")
   end
 end

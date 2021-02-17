@@ -18,6 +18,13 @@ class ConversationsController < ApplicationController
     end
     render json: {conversation: @conversation}, status: :ok
   end
+
+  def get_conversation_details
+    @conversation = Conversation.where("id = ? ",  params[:id]).first
+    @messages = @conversation.messages
+    render json: {conversation: @conversation, messages: @messages}, status: :ok
+  end
+
   private
   def conversation_params
     params.permit(:sender_id, :recipient_id, :booked_trip_id)

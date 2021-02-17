@@ -63,6 +63,7 @@ Rails.application.routes.draw do
       # Messages
       get "conversations", to: "conversations#index"
       post "conversations", to: "conversations#create"
+      get "conversations/:id", to: "conversations#get_conversation_details"
 
       get "messages/:conversation_id", to: "messages#index"
       post "messages/:conversation_id", to: "messages#create"

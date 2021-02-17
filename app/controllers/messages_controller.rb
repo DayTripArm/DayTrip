@@ -4,11 +4,12 @@ class MessagesController < ApplicationController
   end
   def index
     @messages = @conversation.messages
-    if @messages.last
-      if @messages.last.user_id != current_user.id
-        @messages.last.read = true;
-      end
-    end
+    # if @messages.last
+    #   if @messages.last.login_id != current_user.id
+    #     @messages.last.read = true;
+    #   end
+    # end
+    render json: @messages, status: :ok
   end
   def new
     @message = @conversation.messages.new
@@ -21,6 +22,6 @@ class MessagesController < ApplicationController
   end
   private
   def message_params
-    params.require(:message).permit(:body, :user_id)
+    params.require(:message).permit(:body, :login_id)
   end
 end
