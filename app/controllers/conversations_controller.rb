@@ -1,9 +1,9 @@
 class ConversationsController < ApplicationController
   # before_action :authenticate_user
   def index
-    join_str = "JOIN profiles on profiles.id <> #{params[:user_id]}
-                JOIN photos on photos.login_id <> #{params[:user_id]} and file_type=1"
-    @conversations = Conversation.select("conversations.id as conversation_id, conversations.sender_id, conversations.recipient_id,
+    join_str = "JOIN profiles on (profiles.id = sender_id or profiles.id = recipient_id) and profiles.id <> #{params[:user_id]}
+                JOIN photos on (photos.login_id = sender_id or photos.login_id = recipient_id) and photos.login_id <> #{params[:user_id]} and file_type=1"
+    @conversations = Conversation.select("conversations.id, conversations.sender_id, conversations.recipient_id, conversations.booked_trip_id,
                                           booked_trips.pickup_location, booked_trips.pickup_time, booked_trips.trip_day, trips.title,
                                           profiles.id as user_id, profiles.name as recipient_name, photos.name as recipient_img")
                          .joins(:booked_trip =>[:trip])
