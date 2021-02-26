@@ -8,7 +8,7 @@ class ConversationsController < ApplicationController
                                           profiles.id as user_id, profiles.name as recipient_name, photos.name as recipient_img")
                          .joins(:booked_trip =>[:trip])
                          .joins(join_str)
-                         .where("sender_id = ? or recipient_id= ?",  params[:user_id], params[:user_id])
+                         .where("#{params[:contact_name].blank? ? "" : "profiles.name ilike '%#{params[:contact_name]}%' and "} sender_id = ? or recipient_id= ?",  params[:user_id], params[:user_id])
     conversations_list = JSON.parse(@conversations.to_json)
     conversations_list.each do |conversation|
       conversation["recipient_img"] = conversation["recipient_img"].blank? ? File.join("/uploads","profile_photos","blank-profile.png") :
