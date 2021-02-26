@@ -1,7 +1,7 @@
 Rails.application.routes.draw do
    devise_for :admin_users, :logins,  ActiveAdmin::Devise.config
    ActiveAdmin.routes(self)
-
+   mount ActionCable.server => '/cable'
    scope "api" do
       # SignUp and SignIn API calls routes
       post "/sign_up", to: "logins#sign_up"
