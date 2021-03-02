@@ -11,15 +11,7 @@ class MessagesController < ApplicationController
     # end
     render json: @messages, status: :ok
   end
-  def new
-    @message = @conversation.messages.new
-  end
-  def create
-    @message = @conversation.messages.new(message_params)
-    if @message.save
-      render json: {message: "Message is saved"}, status: :ok
-    end
-  end
+
   private
   def message_params
     params.require(:message).permit(:body, :login_id)
