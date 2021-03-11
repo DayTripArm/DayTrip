@@ -3,12 +3,11 @@ class MessagesController < ApplicationController
     @conversation = Conversation.find(params[:conversation_id])
   end
   def index
+    auth_user = params[:user_id] #get authenticated user id
     @messages = @conversation.messages
-    # if @messages.last
-    #   if @messages.last.login_id != current_user.id
-    #     @messages.last.read = true;
-    #   end
-    # end
+    unless auth_user.nil?
+      @messages.map { |message|message.update_attribute(:read, true) if message.login_id != auth_user.to_i}
+    end
     render json: @messages, status: :ok
   end
 

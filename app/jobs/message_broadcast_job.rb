@@ -7,6 +7,7 @@ class MessageBroadcastJob < ApplicationJob
                    id: message.id,
                    conversation_id: message.conversation_id,
                    login_id: message.login_id,
+                   read: message.read,
                    body: message.body)
   end
 end

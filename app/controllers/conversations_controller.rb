@@ -7,16 +7,18 @@ class ConversationsController < ApplicationController
 																																	 from messages where conversation_id = conversations.id)"
     @conversations = Conversation.select("conversations.id, conversations.sender_id, conversations.recipient_id, conversations.booked_trip_id,
                                           booked_trips.pickup_location, booked_trips.pickup_time, booked_trips.trip_day, trips.title,
-                                          profiles.id as user_id, profiles.name as recipient_name, photos.name as recipient_img, messages.created_at, messages.read")
+                                          profiles.id as user_id, profiles.name as recipient_name, photos.name as recipient_img, messages.created_at")
                          .joins(:booked_trip =>[:trip])
                          .joins(join_str)
                          .where("sender_id = ? or recipient_id= ?",  params[:user_id], params[:user_id])
                          .where("#{params[:contact_name].blank? ? "" : "profiles.name ilike '%#{params[:contact_name]}%'"} ")
                          .order("messages.created_at DESC")
+
     conversations_list = JSON.parse(@conversations.to_json)
     conversations_list.each do |conversation|
       conversation["recipient_img"] = conversation["recipient_img"].blank? ? File.join("/uploads","profile_photos","blank-profile.png") :
                                           PhotosHelper::get_photo_full_path(conversation["recipient_img"], "profile_photos", conversation["user_id"].to_s)
+      conversation["unread_messages"]  = Message.where(:conversation_id => conversation["id"], :read => false).where.not(:login_id => params[:user_id]).count
     end
     render json: {conversations_list: conversations_list}, status: :ok
   end
