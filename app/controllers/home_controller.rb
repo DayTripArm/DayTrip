@@ -46,6 +46,7 @@ class HomeController < ApplicationController
                                 params[:price_range].blank? ? 25000: params[:price_range][0].to_i,
                                 params[:price_range].blank? ? 85000: params[:price_range][1].to_i).distinct
       end
+      drivers = drivers.joins("INNER JOIN booked_trips on booked_trips.driver_id = logins.id").where("? NOT IN (SELECT trip_day FROM booked_trips)", params[:date].to_date)
       totalCount = drivers.size
       drivers = drivers.limit(params[:limit] || 5).offset(params[:offset] || 0)
 
