@@ -1,7 +1,7 @@
 class TripsController < ApplicationController
   def index
     trips_arr = Array.new()
-    trips = Trip.active_trips
+    trips = Trip.active_trips(params[:lang])
     tripsTotalCount = trips.size
     if params[:query]
       trips = trips.searched_trips(params[:query])
@@ -28,7 +28,7 @@ class TripsController < ApplicationController
   def trip_individual
     if params[:id]
       begin
-        trip = Trip.active_trips.joins(:destinations_in_trips, :destinations)
+        trip = Trip.active_trips(params[:lang]).joins(:destinations_in_trips, :destinations)
                    .where(id: params[:id]).first
         render json: {
             trip: trip,
