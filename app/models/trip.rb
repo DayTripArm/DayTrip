@@ -20,7 +20,7 @@ class Trip < ApplicationRecord
         .where("trips.title ilike  :search OR trips.agenda ilike :search OR destinations.title ilike :search OR destinations.description ilike :search", search: "%#{query}%")
         .distinct() }
   scope :filter_trips,-> (limit,offset) { select("id, title, images, trip_duration, is_top_choice").limit(limit).offset(offset) }
-  scope :top_choices, -> (lang) { where({:is_top_choice => true, :lang => lang}) }
+  scope :top_choices, ->  { where(:is_top_choice => true) }
 
   validates :destinations_in_trips, presence: { :message => "must be selected." }
   validates_presence_of :lang
