@@ -1,13 +1,13 @@
 ActiveAdmin.register Hero do
   permit_params :lang, :title, :description, :btn_title, :btn_link, :published, :image
-
-  LANGUAGES = [["English","en"], ["Russian","ru"], ["Armenian","am"]]
   
   index do
     column :title
     column :created_at
     column :published
-	column :lang
+    column 'Language' do |res|
+      LANGUAGES.rassoc("#{res.lang}").first
+    end
     actions
   end
 

@@ -1,6 +1,5 @@
 ActiveAdmin.register Trip do
   permit_params :lang, :title, :trip_duration, :start_location, :agenda, :published, destinations_in_trips_attributes: [:id, :stops_title, :position, :trip_id, :destination_id, :_destroy], map_image: [],  images: []
-  LANGUAGES = [["English","en"], ["Russian","ru"], ["Armenian","am"]]
   scope "All", :all
   scope "Top Choices", :top_choices
 
@@ -8,7 +7,9 @@ ActiveAdmin.register Trip do
     column :title
     column :trip_duration
     column :published
-    column :lang
+    column 'Language' do |res|
+      LANGUAGES.rassoc("#{res.lang}").first
+    end
     actions defaults: true do |t|
       unless t.is_top_choice
       link_to 'Add to Top Choices', change_top_choice_admin_trip_path(t.id)

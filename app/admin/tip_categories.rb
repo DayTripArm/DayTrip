@@ -1,7 +1,5 @@
 ActiveAdmin.register TipCategory do
   permit_params :title, :category_type, :lang
-
-  LANGUAGES = [["English","en"], ["Russian","ru"], ["Armenian","am"]]
   
   index do
     column :title
@@ -13,7 +11,9 @@ ActiveAdmin.register TipCategory do
         "Driver price tip"
       end
     end
-    column 'Language', :lang
+    column 'Language' do |res|
+      LANGUAGES.rassoc("#{res.lang}").first
+    end
     actions
   end
 

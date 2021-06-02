@@ -1,12 +1,12 @@
 ActiveAdmin.register Destination do
   permit_params :title, :description, :published, :image, :lang
 
-  LANGUAGES = [["English","en"], ["Russian","ru"], ["Armenian","am"]]
-
   index do
     column :title
     column :published
-    column 'Language', :lang
+    column 'Language' do |res|
+      LANGUAGES.rassoc("#{res.lang}").first
+    end
     actions
   end
 

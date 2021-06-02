@@ -1,14 +1,14 @@
 ActiveAdmin.register Tip do
   permit_params :title, :description, :tip_category_id, :lang
 
-  LANGUAGES = [["English","en"], ["Russian","ru"], ["Armenian","am"]]
-
   index do
     column :title
     column do |m|
       tc = m.tip_category_id ? TipCategory.find(m.tip_category_id).title : ''
     end
-    column 'Language', :lang
+    column 'Language' do |res|
+      LANGUAGES.rassoc("#{res.lang}").first
+    end
     actions
   end
 

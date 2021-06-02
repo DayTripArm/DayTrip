@@ -1,0 +1,1 @@
+LANGUAGES = [["English","en"], ["Russian","ru"], ["Armenian","am"]]
