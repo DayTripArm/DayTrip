@@ -1,4 +1,7 @@
 class Login < ApplicationRecord
+  require 'uri'
+  require 'net/http'
+
   devise :confirmable
 
   has_one :profile
@@ -18,6 +21,7 @@ class Login < ApplicationRecord
   validates :email, presence: true, uniqueness: {:message => ' is already registered.'}, if: Proc.new { |user| user.confirmed_at.blank? }
   validates :email, format: { with: URI::MailTo::EMAIL_REGEXP }, if: Proc.new{ |user| user.confirmed_at.blank? }
   validates :password, length: { minimum: 6 }, if: Proc.new { |user| user.confirmed_at.blank? }
+  validate :disposable_email
 
   scope :exclude_fields, ->  { select( Login.attribute_names + Profile.attribute_names - [ 'login_id', 'password_digest', 'created_at', 'updated_at'] ) }
 
@@ -25,5 +29,15 @@ class Login < ApplicationRecord
     data = access_token.info
     user = Login.where(email: data['email']).first
     user
+  end
+
+  def disposable_email
+    # An external API to check blacklisted/temporary emails like mailinator.com
+    uri = URI('https://disposable.debounce.io/?email=' + self.email)
+    res = Net::HTTP.get_response(uri)
+    if res.is_a?(Net::HTTPSuccess)
+      result  = JSON.parse(res.body)
+      errors.add(:email, " address is blacklisted") if result.has_key?("disposable") && result["disposable"].eql?("true")
+    end
   end
 end
