@@ -60,10 +60,14 @@ class BookedTripsController < ApplicationController
       booked_trip = BookedTrip.where({driver_id: params[:driver_id], traveler_id: params[:traveler_id], trip_day: params[:trip_day]})
       if booked_trip.blank?
         new_booked_trip = BookedTrip.new(booked_trips_params)
-        new_booked_trip.save
-        render json: {message: "Your trip has booked succesfully"}, status: :ok
+        if !params[:promo_code].blank? && HostReferralProgram.where({promo_code: params[:promo_code]}).blank?
+          render json: {message: "Promo code does not exist"}, status: :internal_server_error
+        else
+          new_booked_trip.save
+          render json: {message: "Your trip has booked succesfully"}, status: :ok
+        end
       else
-        render json: {message: "You've already booked trip for #{params[:day]}."}, status: :ok
+        render json: {message: "You've already booked trip for #{params[:day]}"}, status: :ok
       end
     rescue StandardError, ActiveRecordError => e
       errors << e.message unless e.message.blank?
@@ -141,6 +145,6 @@ class BookedTripsController < ApplicationController
 
   private
   def booked_trips_params
-    params.except(:booked_trip, :user_type, :trip_title).permit(:driver_id, :traveler_id, :trip_id, :trip_day, :travelers_count, :pickup_location, :pickup_time, :price, :notes)
+    params.except(:booked_trip, :user_type, :trip_title).permit(:driver_id, :traveler_id, :trip_id, :trip_day, :travelers_count, :pickup_location, :pickup_time, :price, :notes, :promo_code)
   end
 end
