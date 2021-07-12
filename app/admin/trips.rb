@@ -1,4 +1,5 @@
 ActiveAdmin.register Trip do
+  menu :parent => "Tour"
   permit_params :lang, :title, :trip_duration, :start_location, :agenda, :published, destinations_in_trips_attributes: [:id, :stops_title, :position, :trip_id, :destination_id, :_destroy], map_image: [],  images: []
   scope "All", :all
   scope "Top Choices", :top_choices

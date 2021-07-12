@@ -1,4 +1,5 @@
 ActiveAdmin.register Destination do
+  menu :parent => "Tour"
   permit_params :title, :description, :published, :image, :lang
 
   index do

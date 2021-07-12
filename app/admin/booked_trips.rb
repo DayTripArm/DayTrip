@@ -1,4 +1,5 @@
 ActiveAdmin.register BookedTrip do
+  menu :parent => "Tour"
   actions :index, :show, :destroy
   index do
     column "Trip Name" do |res|

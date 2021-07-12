@@ -25,7 +25,7 @@ ActiveAdmin.register TipCategory do
     f.inputs do
       f.input :lang, :label => 'Language', :as => :select, :collection => LANGUAGES, input_html: { style: "width: 100px; height: 30px"}
       f.input :title
-      f.input :category_type, as: :select, collection: TipCategory::TIPS_TYPE
+      f.input :category_type, as: :select, collection: TipCategory::TIPS_TYPE,  input_html: { style: "height: 30px"}
     end
     f.actions
   end

@@ -1,4 +1,5 @@
 ActiveAdmin.register HitTheRoad do
+  menu :parent => "HomePage"
   permit_params :title, :description, :published, :image, :lang
 
   index do

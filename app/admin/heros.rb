@@ -1,4 +1,5 @@
 ActiveAdmin.register Hero do
+  menu :parent => "HomePage"
   permit_params :lang, :title, :description, :btn_title, :btn_link, :published, :image
   
   index do
